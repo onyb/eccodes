@@ -216,6 +216,8 @@ int grib_get_double_ndelements(int* gid, char* key, int* ipin_index, int ipin_in
 // nearest
 int grib_c_find_nearest_single(int* gid, int* INPUT, double* INPUT, double* INPUT, double* OUTPUT, double* OUTPUT, double* OUTPUT, double* OUTPUT, int* OUTPUT);
 int grib_c_find_nearest_four_single(int* gid, int* INPUT, double* INPUT, double* INPUT, double* outlats, double* outlons, double* values, double* distances, int* indexes);
+int grib_c_find_nearest_multiple(int* gid, int* INPUT, double* INPUT, double* INPUT, double* OUTPUT, double* OUTPUT, double* OUTPUT, double* OUTPUT, int* OUTPUT, int* npoints);
+
 // ---
 
 /*
