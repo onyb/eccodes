@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -156,7 +156,7 @@ static int find(grib_nearest* nearest, grib_handle* h,
         double olat=1.e10;
         long n=0;
 
-        ilat=0,ilon=0;
+        ilat=0; ilon=0;
         if (grib_is_missing(h,self->Nj,&ret)) {
             grib_context_log(h->context, GRIB_LOG_DEBUG,"Key '%s' is missing", self->Nj);
             return ret ? ret : GRIB_GEOCALCULUS_PROBLEM;
@@ -243,11 +243,11 @@ static int find(grib_nearest* nearest, grib_handle* h,
             nlon=0;
             for (jj=0;jj<self->j[0];jj++) {
                 row_count=0;ilon_first=0;ilon_last=0;
-                grib_get_reduced_row(pl[jj],self->lon_first,self->lon_last,&row_count,&ilon_first,&ilon_last);
+                grib_get_reduced_row_wrapper(h, pl[jj],self->lon_first,self->lon_last,&row_count,&ilon_first,&ilon_last);
                 nlon+=row_count;
             }
             row_count=0;ilon_first=0;ilon_last=0;
-            grib_get_reduced_row(pl[self->j[0]],self->lon_first,self->lon_last,&row_count,&ilon_first,&ilon_last);
+            grib_get_reduced_row_wrapper(h, pl[self->j[0]],self->lon_first,self->lon_last,&row_count,&ilon_first,&ilon_last);
             nplm1=row_count-1;
         }
         lons=self->lons+nlon;
@@ -276,7 +276,7 @@ static int find(grib_nearest* nearest, grib_handle* h,
         if (!nearest_lons_found) {
             if (!self->global) {
                 row_count=0;ilon_first=0;ilon_last=0;
-                grib_get_reduced_row(pl[self->j[0]],self->lon_first,self->lon_last,&row_count,&ilon_first,&ilon_last);
+                grib_get_reduced_row_wrapper(h, pl[self->j[0]],self->lon_first,self->lon_last,&row_count,&ilon_first,&ilon_last);
             } else {
                 row_count=pl[self->j[0]];
             }
@@ -294,11 +294,11 @@ static int find(grib_nearest* nearest, grib_handle* h,
         } else {
             for (jj=0;jj<self->j[1];jj++) {
                 row_count=0;ilon_first=0;ilon_last=0;
-                grib_get_reduced_row(pl[jj],self->lon_first,self->lon_last,&row_count,&ilon_first,&ilon_last);
+                grib_get_reduced_row_wrapper(h, pl[jj],self->lon_first,self->lon_last,&row_count,&ilon_first,&ilon_last);
                 nlon+=row_count;
             }
             row_count=0;ilon_first=0;ilon_last=0;
-            grib_get_reduced_row(pl[self->j[1]],self->lon_first,self->lon_last,&nplm1,&ilon_first,&ilon_last);
+            grib_get_reduced_row_wrapper(h, pl[self->j[1]],self->lon_first,self->lon_last,&nplm1,&ilon_first,&ilon_last);
             nplm1--;
         }
         lons=self->lons+nlon;
@@ -327,7 +327,7 @@ static int find(grib_nearest* nearest, grib_handle* h,
         if (!nearest_lons_found) {
             if (!self->global) {
                 row_count=0;ilon_first=0;ilon_last=0;
-                grib_get_reduced_row(pl[self->j[1]],self->lon_first,self->lon_last,&row_count,&ilon_first,&ilon_last);
+                grib_get_reduced_row_wrapper(h, pl[self->j[1]],self->lon_first,self->lon_last,&row_count,&ilon_first,&ilon_last);
             } else {
                 row_count=pl[self->j[1]];
             }

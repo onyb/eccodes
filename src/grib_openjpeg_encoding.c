@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -296,7 +296,7 @@ static void opj_memory_stream_do_nothing(void * p_user_data)
 }
 
 /* Create a stream to use memory as the input or output */
-opj_stream_t* opj_stream_create_default_memory_stream(opj_memory_stream* memoryStream, OPJ_BOOL is_read_stream)
+static opj_stream_t* opj_stream_create_default_memory_stream(opj_memory_stream* memoryStream, OPJ_BOOL is_read_stream)
 {
 	opj_stream_t* stream;
 
@@ -496,7 +496,7 @@ int grib_openjpeg_decode(grib_context *c, unsigned char *buf, size_t *buflen, do
         err = GRIB_DECODING_ERROR;
         goto cleanup;
     }
-    if ( (image->numcomps != 1) || !(image->x1 * image->y1) ) {
+    if ( (image->numcomps != 1) || (image->x1 * image->y1)==0 ) {
         err = GRIB_DECODING_ERROR;
         goto cleanup;
     }

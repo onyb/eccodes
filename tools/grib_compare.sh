@@ -79,7 +79,7 @@ is printed.
 
 echo "-# Some options are provided to compare only a set of keys in the messages. The option -H is used to compare only the headers 
 coded in the message, it doesn't compare the data values. 
-The option \"-c key1:[i/d/s/n],key2:[i/d/s/n],... \" can be used to 
+The option \"-c key1:[i|d|s|n],key2:[i|d|s|n],... \" can be used to 
 compare a set of keys or namespaces. The letter after the colon is optional and it is used to force the
 type used in the comparison which is otherwise assumed to be the native type of the key. 
 The possible types are:
@@ -91,7 +91,7 @@ The possible types are:
 When the type \"n\" is used all the set of keys belonging to the specified namespace
 are compared assuming their own native type.
 To illustrate how these options work we change the values coded in 
-a message using grib_filter with the following rules file (see \ref grib_filter). "
+a message using grib_filter with the following rules file (see grib_filter). "
 echo "\\verbatim
 set bitsPerValue=10;
 set values={1,2.5,3,4,5,6,70};

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -17,26 +17,28 @@
 
 grib_option grib_options[]={
         /*  {id, args, help}, on, command_line, value*/
-        {"j:","s/f/a","\n\t\tJSON mode (JavaScript Object Notation)."
+        {"j:","s|f|a","\n\t\tJSON mode (JavaScript Object Notation)."
                 "\n\t\tOptions: s->structure, f->flat (only data), a->all attributes"
                 "\n\t\tDefault mode is structure.\n",
                 1,1,"s"},
-        {"D:","filter/fortran/python/C","\n\t\tDecoding dump. Provides instructions to decode the input message."
+        {"D:","filter|fortran|python|C","\n\t\tDecoding dump. Provides instructions to decode the input message."
                 "\n\t\tOptions: filter  -> filter instructions file to decode input BUFR"
                 "\n\t\t         fortran -> fortran program to decode the input BUFR"
                 "\n\t\t         python  -> python script to decode the input BUFR"
                 "\n\t\t         C       -> C program to decode the input BUFR"
                 "\n\t\tDefault mode is filter.\n",
                 0,1,"filter"},
-        {"E:","filter/fortran/python/C","\n\t\tEncoding dump. Provides instructions to create the input message."
+        {"E:","filter|fortran|python|C","\n\t\tEncoding dump. Provides instructions to create the input message."
                 "\n\t\tOptions: filter  -> filter instructions file to encode input BUFR"
                 "\n\t\t         fortran -> fortran program to encode the input BUFR"
                 "\n\t\t         python  -> python script to encode the input BUFR"
                 "\n\t\t         C       -> C program to encode the input BUFR"
                 "\n\t\tDefault mode is filter.\n",
                 0,1,"filter"},
+
         {"S",0,0,1,0,0},
         {"O",0,"Octet mode. WMO documentation style dump.\n",0,1,0},
+        {"p",0,"Plain dump.\n",0,1,0},
         /* {"D",0,0,0,1,0},  */  /* See ECC-215 */
         {"d",0,"Print all data values.\n",1,1,0},
         {"u",0,"Print only some values.\n",0,1,0},
@@ -57,7 +59,7 @@ grib_option grib_options[]={
 
 char* grib_tool_description="Dump the content of a BUFR file in different formats.";
 char* grib_tool_name="bufr_dump";
-char* grib_tool_usage="[options] file file ...";
+char* grib_tool_usage="[options] bufr_file bufr_file ...";
 static int json=0;
 static char* json_option=0;
 static int first_handle=1;
@@ -108,6 +110,11 @@ int grib_tool_init(grib_runtime_options* options)
                 | GRIB_DUMP_FLAG_OCTECT
                 | GRIB_DUMP_FLAG_VALUES
                 | GRIB_DUMP_FLAG_READ_ONLY;
+    }
+
+    if  (grib_options_on("p")) {
+        options->dump_mode = "bufr_simple";
+        json=0;
     }
 
     if (grib_options_on("D:")) {
@@ -171,7 +178,7 @@ int grib_tool_new_file_action(grib_runtime_options* options,grib_tools_file* fil
     else {
         char tmp[1024];
         sprintf(tmp,"FILE: %s ",options->current_infile->name);
-        if (!grib_options_on("C"))
+        if (!grib_options_on("p"))
             fprintf(stdout,"***** %s\n",tmp);
     }
 
@@ -352,6 +359,9 @@ int grib_tool_new_handle_action(grib_runtime_options* options, grib_handle* h)
         print_header(options);
         dumper=grib_dump_content_with_dumper(h,dumper,stdout,dumper_name,options->dump_flags,0);
         if (!dumper) exit(1);
+        if (grib_options_on("p")) {
+            printf("\n"); /* One blank line to separate the messages */
+        }
     }
 
     return 0;

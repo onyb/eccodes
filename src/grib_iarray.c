@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -15,6 +15,18 @@
  ***************************************************************************/
 
 #include "grib_api_internal.h"
+
+/* For debugging purposes */
+void grib_iarray_print(const char* title, const grib_iarray* iarray)
+{
+    size_t i;
+    Assert(iarray);
+    printf("%s: iarray.n=%lu  \t", title, (unsigned long)iarray->n);
+    for (i=0; i<iarray->n; i++) {
+        printf("iarray[%lu]=%ld\t", (unsigned long)i, iarray->v[i]);
+    }
+    printf("\n");
+}
 
 grib_iarray* grib_iarray_new_from_array(grib_context* c,long* a,size_t size)
 {
@@ -213,3 +225,16 @@ long* grib_iarray_get_array(grib_iarray* v)
 }
 
 size_t grib_iarray_used_size(grib_iarray* v) {return v==NULL ? 0 : v->n;}
+
+int grib_iarray_is_constant(grib_iarray* v) {
+  int i;
+  long val;
+  if (v->n == 1) return 1;
+
+  val=v->v[0];
+  for (i=1;i<v->n;i++)  {
+    if (val!=v->v[i]) return 0;
+  }
+  return 1;
+}
+

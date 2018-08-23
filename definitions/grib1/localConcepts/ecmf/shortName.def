@@ -204,7 +204,7 @@
 	 table2Version = 128 ;
 	 indicatorOfParameter = 30 ;
 	}
-#Sea-ice cover
+#Sea ice area fraction
 'ci' = {
 	 table2Version = 128 ;
 	 indicatorOfParameter = 31 ;
@@ -434,12 +434,12 @@
 	 table2Version = 128 ;
 	 indicatorOfParameter = 77 ;
 	}
-#Total column liquid water
+#Total column cloud liquid water
 'tclw' = {
 	 table2Version = 128 ;
 	 indicatorOfParameter = 78 ;
 	}
-#Total column ice water
+#Total column cloud ice water
 'tciw' = {
 	 table2Version = 128 ;
 	 indicatorOfParameter = 79 ;
@@ -3319,6 +3319,11 @@
 	 table2Version = 132 ;
 	 indicatorOfParameter = 44 ;
 	}
+#Water vapour flux index
+'wvfi' = {
+	 table2Version = 132 ;
+	 indicatorOfParameter = 45 ;
+	}
 #Convective available potential energy index
 'capei' = {
 	 table2Version = 132 ;
@@ -3488,6 +3493,11 @@
 '~' = {
 	 table2Version = 151 ;
 	 indicatorOfParameter = 193 ;
+	}
+#Water vapour flux
+'wvf' = {
+	 table2Version = 162 ;
+	 indicatorOfParameter = 45 ;
 	}
 #Vertical integral of divergence of cloud liquid water flux
 'vilwd' = {
@@ -3664,6 +3674,21 @@
 	 table2Version = 162 ;
 	 indicatorOfParameter = 141 ;
 	}
+#Standardised precipitation index valid for 3 months
+'spi03' = {
+	 table2Version = 170 ;
+	 indicatorOfParameter = 1 ;
+	}
+#Standardised precipitation index valid for 6 months
+'spi06' = {
+	 table2Version = 170 ;
+	 indicatorOfParameter = 2 ;
+	}
+#Standardised precipitation index valid for 12 months
+'spi12' = {
+	 table2Version = 170 ;
+	 indicatorOfParameter = 3 ;
+	}
 #100 metre U wind component anomaly
 '100ua' = {
 	 table2Version = 171 ;
@@ -3674,6 +3699,16 @@
 	 table2Version = 171 ;
 	 indicatorOfParameter = 7 ;
 	}
+#Lake mix-layer temperature anomaly
+'lmlta' = {
+	 table2Version = 171 ;
+	 indicatorOfParameter = 24 ;
+	}
+#Lake ice depth anomaly
+'licda' = {
+	 table2Version = 171 ;
+	 indicatorOfParameter = 25 ;
+	}
 #Maximum temperature at 2 metres in the last 6 hours anomaly
 'mx2t6a' = {
 	 table2Version = 171 ;
@@ -3683,6 +3718,26 @@
 'mn2t6a' = {
 	 table2Version = 171 ;
 	 indicatorOfParameter = 122 ;
+	}
+#Mean surface runoff rate
+'msror' = {
+	 table2Version = 172 ;
+	 indicatorOfParameter = 8 ;
+	}
+#Mean sub-surface runoff rate
+'mssror' = {
+	 table2Version = 172 ;
+	 indicatorOfParameter = 9 ;
+	}
+#Mean surface runoff rate anomaly
+'msrora' = {
+	 table2Version = 173 ;
+	 indicatorOfParameter = 8 ;
+	}
+#Mean sub-surface runoff rate anomaly
+'mssrora' = {
+	 table2Version = 173 ;
+	 indicatorOfParameter = 9 ;
 	}
 #Clear-sky (II) down surface sw flux
 'sswcsdown' = {
@@ -3714,13 +3769,13 @@
 	 table2Version = 174 ;
 	 indicatorOfParameter = 52 ;
 	}
-#2m specific humidity
-'~' = {
+#2 metre specific humidity
+'2sh' = {
 	 table2Version = 174 ;
 	 indicatorOfParameter = 96 ;
 	}
-#Sea-ice Snow Thickness
-'sist' = {
+#Sea ice snow thickness
+'sisnthick' = {
 	 table2Version = 174 ;
 	 indicatorOfParameter = 97 ;
 	}
@@ -3843,6 +3898,11 @@
 'soapr' = {
 	 table2Version = 210 ;
 	 indicatorOfParameter = 59 ;
+	}
+#Injection height (from IS4FIRES)
+'injh' = {
+	 table2Version = 210 ;
+	 indicatorOfParameter = 60 ;
 	}
 #Particulate matter d < 1 um
 'pm1' = {
@@ -6714,93 +6774,93 @@
 	 table2Version = 215 ;
 	 indicatorOfParameter = 149 ;
 	}
-#Assimetry factor at 340 nm
-'assimetry340' = {
+#Asymmetry factor at 340 nm
+'asymmetry340' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 150 ;
 	}
-#Assimetry factor at 355 nm
-'assimetry355' = {
+#Asymmetry factor at 355 nm
+'asymmetry355' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 151 ;
 	}
-#Assimetry factor at 380 nm
-'assimetry380' = {
+#Asymmetry factor at 380 nm
+'asymmetry380' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 152 ;
 	}
-#Assimetry factor at 400 nm
-'assimetry400' = {
+#Asymmetry factor at 400 nm
+'asymmetry400' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 153 ;
 	}
-#Assimetry factor at 440 nm
-'assimetry440' = {
+#Asymmetry factor at 440 nm
+'asymmetry440' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 154 ;
 	}
-#Assimetry factor at 469 nm
-'assimetry469' = {
+#Asymmetry factor at 469 nm
+'asymmetry469' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 155 ;
 	}
-#Assimetry factor at 500 nm
-'assimetry500' = {
+#Asymmetry factor at 500 nm
+'asymmetry500' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 156 ;
 	}
-#Assimetry factor at 532 nm
-'assimetry532' = {
+#Asymmetry factor at 532 nm
+'asymmetry532' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 157 ;
 	}
-#Assimetry factor at 550 nm
-'assimetry550' = {
+#Asymmetry factor at 550 nm
+'asymmetry550' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 158 ;
 	}
-#Assimetry factor at 645 nm
-'assimetry645' = {
+#Asymmetry factor at 645 nm
+'asymmetry645' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 159 ;
 	}
-#Assimetry factor at 670 nm
-'assimetry670' = {
+#Asymmetry factor at 670 nm
+'asymmetry670' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 160 ;
 	}
-#Assimetry factor at 800 nm
-'assimetry800' = {
+#Asymmetry factor at 800 nm
+'asymmetry800' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 161 ;
 	}
-#Assimetry factor at 858 nm
-'assimetry858' = {
+#Asymmetry factor at 858 nm
+'asymmetry858' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 162 ;
 	}
-#Assimetry factor at 865 nm
-'assimetry865' = {
+#Asymmetry factor at 865 nm
+'asymmetry865' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 163 ;
 	}
-#Assimetry factor at 1020 nm
-'assimetry1020' = {
+#Asymmetry factor at 1020 nm
+'asymmetry1020' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 164 ;
 	}
-#Assimetry factor at 1064 nm
-'assimetry1064' = {
+#Asymmetry factor at 1064 nm
+'asymmetry1064' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 165 ;
 	}
-#Assimetry factor at 1240 nm
-'assimetry1240' = {
+#Asymmetry factor at 1240 nm
+'asymmetry1240' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 166 ;
 	}
-#Assimetry factor at 1640 nm
-'assimetry1640' = {
+#Asymmetry factor at 1640 nm
+'asymmetry1640' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 167 ;
 	}
@@ -6859,8 +6919,8 @@
 	 table2Version = 215 ;
 	 indicatorOfParameter = 178 ;
 	}
-#Assimetry factor at 2130 nm
-'assimetry2130' = {
+#Asymmetry factor at 2130 nm
+'asymmetry2130' = {
 	 table2Version = 215 ;
 	 indicatorOfParameter = 179 ;
 	}
@@ -8189,8 +8249,8 @@
 	 table2Version = 217 ;
 	 indicatorOfParameter = 3 ;
 	}
-#Methane
-'ch4' = {
+#Methane (chemistry)
+'ch4_c' = {
 	 table2Version = 217 ;
 	 indicatorOfParameter = 4 ;
 	}
@@ -9279,6 +9339,11 @@
 	 table2Version = 228 ;
 	 indicatorOfParameter = 29 ;
 	}
+#2 metre relative humidity with respect to water
+'2rhw' = {
+	 table2Version = 228 ;
+	 indicatorOfParameter = 37 ;
+	}
 #Soil wetness index in layer 1
 'swi1' = {
 	 table2Version = 228 ;
@@ -9309,33 +9374,33 @@
 	 table2Version = 228 ;
 	 indicatorOfParameter = 46 ;
 	}
-#Height of Zero Deg Wet Bulb Temperature
+#Height of zero-degree wet-bulb temperature
 'hwbt0' = {
 	 table2Version = 228 ;
 	 indicatorOfParameter = 47 ;
 	}
-#Height of One Deg Wet Bulb Temperature
+#Height of one-degree wet-bulb temperature
 'hwbt1' = {
 	 table2Version = 228 ;
 	 indicatorOfParameter = 48 ;
 	}
-#Instantaneous total lightning density
+#Instantaneous total lightning flash density
 'litoti' = {
 	 table2Version = 228 ;
 	 indicatorOfParameter = 50 ;
 	}
-#Averaged total lightning density
-'litota' = {
+#Averaged total lightning flash density in the last hour
+'litota1' = {
 	 table2Version = 228 ;
 	 indicatorOfParameter = 51 ;
 	}
-#Instantaneous cloud-to-ground lightning density
+#Instantaneous cloud-to-ground lightning flash density
 'licgi' = {
 	 table2Version = 228 ;
 	 indicatorOfParameter = 52 ;
 	}
-#Averaged cloud-to-ground lightning density
-'licga' = {
+#Averaged cloud-to-ground lightning flash density in the last hour
+'licga1' = {
 	 table2Version = 228 ;
 	 indicatorOfParameter = 53 ;
 	}
@@ -9883,6 +9948,11 @@
 'mper' = {
 	 table2Version = 235 ;
 	 indicatorOfParameter = 70 ;
+	}
+#Total precipitation rate
+'tprate' = {
+	 table2Version = 254 ;
+	 indicatorOfParameter = 48 ;
 	}
 #Ceiling
 'ceil' = {
@@ -11979,7 +12049,7 @@
 	 table2Version = 140 ;
 	 indicatorOfParameter = 220 ;
 	}
-#Mean wave period based on second moment
+#Mean zero-crossing wave period
 'mp2' = {
 	 table2Version = 140 ;
 	 indicatorOfParameter = 221 ;
@@ -12029,7 +12099,7 @@
 	 table2Version = 140 ;
 	 indicatorOfParameter = 230 ;
 	}
-#Peak period of 1D spectra
+#Peak wave period
 'pp1d' = {
 	 table2Version = 140 ;
 	 indicatorOfParameter = 231 ;
@@ -12170,12 +12240,12 @@
 	 indicatorOfParameter = 131 ;
 	}
 #Ocean U wind component
-'ocu' = {
+'~' = {
 	 table2Version = 150 ;
 	 indicatorOfParameter = 133 ;
 	}
 #Ocean V wind component
-'ocv' = {
+'~' = {
 	 table2Version = 150 ;
 	 indicatorOfParameter = 134 ;
 	}
@@ -12319,28 +12389,28 @@
 	 table2Version = 151 ;
 	 indicatorOfParameter = 128 ;
 	}
-#Ocean potential temperature
-'ocpt' = {
+#Sea water potential temperature
+'thetao' = {
 	 table2Version = 151 ;
 	 indicatorOfParameter = 129 ;
 	}
-#Salinity
-'s' = {
+#Sea water practical salinity
+'so' = {
 	 table2Version = 151 ;
 	 indicatorOfParameter = 130 ;
 	}
-#Ocean current zonal component
+#Eastward sea water velocity
 'ocu' = {
 	 table2Version = 151 ;
 	 indicatorOfParameter = 131 ;
 	}
-#Ocean current meridional component
+#Northward sea water velocity
 'ocv' = {
 	 table2Version = 151 ;
 	 indicatorOfParameter = 132 ;
 	}
-#Ocean current vertical component
-'ocw' = {
+#Upward sea water velocity
+'wo' = {
 	 table2Version = 151 ;
 	 indicatorOfParameter = 133 ;
 	}
@@ -12364,8 +12434,8 @@
 	 table2Version = 151 ;
 	 indicatorOfParameter = 137 ;
 	}
-#Sigma-theta
-'sth' = {
+#Sea water sigma theta
+'sigmat' = {
 	 table2Version = 151 ;
 	 indicatorOfParameter = 138 ;
 	}
@@ -12399,8 +12469,8 @@
 	 table2Version = 151 ;
 	 indicatorOfParameter = 144 ;
 	}
-#Sea level
-'sl' = {
+#Sea surface height
+'zos' = {
 	 table2Version = 151 ;
 	 indicatorOfParameter = 145 ;
 	}
@@ -12409,8 +12479,8 @@
 	 table2Version = 151 ;
 	 indicatorOfParameter = 146 ;
 	}
-#Barotropic stream function
-'bsf' = {
+#Ocean barotropic stream function
+'stfbarot' = {
 	 table2Version = 151 ;
 	 indicatorOfParameter = 147 ;
 	}
@@ -12439,13 +12509,13 @@
 	 table2Version = 151 ;
 	 indicatorOfParameter = 152 ;
 	}
-#U stress
-'tax' = {
+#Surface downward eastward stress
+'taueo' = {
 	 table2Version = 151 ;
 	 indicatorOfParameter = 153 ;
 	}
-#V stress
-'tay' = {
+#Surface downward northward stress
+'tauno' = {
 	 table2Version = 151 ;
 	 indicatorOfParameter = 154 ;
 	}
@@ -12489,8 +12559,8 @@
 	 table2Version = 151 ;
 	 indicatorOfParameter = 162 ;
 	}
-#20 degrees isotherm depth
-'20d' = {
+#Depth of 20C isotherm
+'t20d' = {
 	 table2Version = 151 ;
 	 indicatorOfParameter = 163 ;
 	}
@@ -13860,7 +13930,7 @@
 	 indicatorOfParameter = 169 ;
 	}
 #Soil temperature anomaly level 2
-'slal2' = {
+'stal2' = {
 	 table2Version = 171 ;
 	 indicatorOfParameter = 170 ;
 	}
@@ -14374,13 +14444,13 @@
 	 table2Version = 172 ;
 	 indicatorOfParameter = 179 ;
 	}
-#East-West surface stress
-'~' = {
+#East-West surface stress rate of accumulation
+'ewssra' = {
 	 table2Version = 172 ;
 	 indicatorOfParameter = 180 ;
 	}
-#North-South surface stress
-'~' = {
+#North-South surface stress rate of accumulation
+'nsssra' = {
 	 table2Version = 172 ;
 	 indicatorOfParameter = 181 ;
 	}
@@ -14434,8 +14504,8 @@
 	 table2Version = 172 ;
 	 indicatorOfParameter = 211 ;
 	}
-#Solar insolation
-'~' = {
+#Solar insolation rate of accumulation
+'soira' = {
 	 table2Version = 172 ;
 	 indicatorOfParameter = 212 ;
 	}
@@ -14479,8 +14549,8 @@
 	 table2Version = 173 ;
 	 indicatorOfParameter = 50 ;
 	}
-#Stratiform precipitation (Large-scale precipitation) anomaly
-'~' = {
+#Stratiform precipitation (Large-scale precipitation) anomalous rate of accumulation
+'lspara' = {
 	 table2Version = 173 ;
 	 indicatorOfParameter = 142 ;
 	}
@@ -14499,13 +14569,13 @@
 	 table2Version = 173 ;
 	 indicatorOfParameter = 145 ;
 	}
-#Surface sensible heat flux anomaly
-'~' = {
+#Surface sensible heat flux anomalous rate of accumulation
+'sshfara' = {
 	 table2Version = 173 ;
 	 indicatorOfParameter = 146 ;
 	}
-#Surface latent heat flux anomaly
-'~' = {
+#Surface latent heat flux anomalous rate of accumulation
+'slhfara' = {
 	 table2Version = 173 ;
 	 indicatorOfParameter = 147 ;
 	}
@@ -14524,48 +14594,48 @@
 	 table2Version = 173 ;
 	 indicatorOfParameter = 154 ;
 	}
-#Surface solar radiation downwards anomaly
-'~' = {
+#Surface solar radiation downwards anomalous rate of accumulation
+'ssrdara' = {
 	 table2Version = 173 ;
 	 indicatorOfParameter = 169 ;
 	}
-#Surface thermal radiation downwards anomaly
-'~' = {
+#Surface thermal radiation downwards anomalous rate of accumulation
+'strdara' = {
 	 table2Version = 173 ;
 	 indicatorOfParameter = 175 ;
 	}
-#Surface solar radiation anomaly
-'~' = {
+#Surface solar radiation anomalous rate of accumulation
+'ssrara' = {
 	 table2Version = 173 ;
 	 indicatorOfParameter = 176 ;
 	}
-#Surface thermal radiation anomaly
-'~' = {
+#Surface thermal radiation anomalous rate of accumulation
+'strara' = {
 	 table2Version = 173 ;
 	 indicatorOfParameter = 177 ;
 	}
-#Top solar radiation anomaly
-'~' = {
+#Top solar radiation anomalous rate of accumulation
+'tsrara' = {
 	 table2Version = 173 ;
 	 indicatorOfParameter = 178 ;
 	}
-#Top thermal radiation anomaly
-'~' = {
+#Top thermal radiation anomalous rate of accumulation
+'ttrara' = {
 	 table2Version = 173 ;
 	 indicatorOfParameter = 179 ;
 	}
-#East-West surface stress anomaly
-'~' = {
+#East-West surface stress anomalous rate of accumulation
+'ewssara' = {
 	 table2Version = 173 ;
 	 indicatorOfParameter = 180 ;
 	}
-#North-South surface stress anomaly
-'~' = {
+#North-South surface stress anomalous rate of accumulation
+'nsssara' = {
 	 table2Version = 173 ;
 	 indicatorOfParameter = 181 ;
 	}
-#Evaporation anomaly
-'~' = {
+#Evaporation anomalous rate of accumulation
+'evara' = {
 	 table2Version = 173 ;
 	 indicatorOfParameter = 182 ;
 	}
@@ -14589,8 +14659,8 @@
 	 table2Version = 173 ;
 	 indicatorOfParameter = 197 ;
 	}
-#Runoff anomaly
-'~' = {
+#Runoff anomalous rate of accumulation
+'roara' = {
 	 table2Version = 173 ;
 	 indicatorOfParameter = 205 ;
 	}
@@ -14614,8 +14684,8 @@
 	 table2Version = 173 ;
 	 indicatorOfParameter = 211 ;
 	}
-#Solar insolation anomaly
-'~' = {
+#Solar insolation anomalous rate of accumulation
+'soiara' = {
 	 table2Version = 173 ;
 	 indicatorOfParameter = 212 ;
 	}
@@ -14740,7 +14810,7 @@
 	 indicatorOfParameter = 95 ;
 	}
 #Sea-ice thickness
-'sit' = {
+'sithick' = {
 	 table2Version = 174 ;
 	 indicatorOfParameter = 98 ;
 	}
@@ -15429,22 +15499,22 @@
 	 table2Version = 210 ;
 	 indicatorOfParameter = 6 ;
 	}
-#Hydrophobic Organic Matter Aerosol Mixing Ratio
+#Hydrophilic Organic Matter Aerosol Mixing Ratio
 'aermr07' = {
 	 table2Version = 210 ;
 	 indicatorOfParameter = 7 ;
 	}
-#Hydrophilic Organic Matter Aerosol Mixing Ratio
+#Hydrophobic Organic Matter Aerosol Mixing Ratio
 'aermr08' = {
 	 table2Version = 210 ;
 	 indicatorOfParameter = 8 ;
 	}
-#Hydrophobic Black Carbon Aerosol Mixing Ratio
+#Hydrophilic Black Carbon Aerosol Mixing Ratio
 'aermr09' = {
 	 table2Version = 210 ;
 	 indicatorOfParameter = 9 ;
 	}
-#Hydrophilic Black Carbon Aerosol Mixing Ratio
+#Hydrophobic Black Carbon Aerosol Mixing Ratio
 'aermr10' = {
 	 table2Version = 210 ;
 	 indicatorOfParameter = 10 ;
@@ -15639,12 +15709,12 @@
 	 table2Version = 210 ;
 	 indicatorOfParameter = 63 ;
 	}
-#Total column Carbon Dioxide
+#CO2 column-mean molar fraction
 'tcco2' = {
 	 table2Version = 210 ;
 	 indicatorOfParameter = 64 ;
 	}
-#Total column Methane
+#CH4 column-mean molar fraction
 'tcch4' = {
 	 table2Version = 210 ;
 	 indicatorOfParameter = 65 ;
@@ -16129,22 +16199,22 @@
 	 table2Version = 211 ;
 	 indicatorOfParameter = 6 ;
 	}
-#Hydrophobic Organic Matter Aerosol Mixing Ratio
+#Hydrophilic Organic Matter Aerosol Mixing Ratio
 'aermr07diff' = {
 	 table2Version = 211 ;
 	 indicatorOfParameter = 7 ;
 	}
-#Hydrophilic Organic Matter Aerosol Mixing Ratio
+#Hydrophobic Organic Matter Aerosol Mixing Ratio
 'aermr08diff' = {
 	 table2Version = 211 ;
 	 indicatorOfParameter = 8 ;
 	}
-#Hydrophobic Black Carbon Aerosol Mixing Ratio
+#Hydrophilic Black Carbon Aerosol Mixing Ratio
 'aermr09diff' = {
 	 table2Version = 211 ;
 	 indicatorOfParameter = 9 ;
 	}
-#Hydrophilic Black Carbon Aerosol Mixing Ratio
+#Hydrophobic Black Carbon Aerosol Mixing Ratio
 'aermr10diff' = {
 	 table2Version = 211 ;
 	 indicatorOfParameter = 10 ;

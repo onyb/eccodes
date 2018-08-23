@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -21,7 +21,7 @@
    CLASS      = action
    SUPER      = action_class_section
    IMPLEMENTS = create_accessor
-   IMPLEMENTS = dump;compile
+   IMPLEMENTS = dump
    IMPLEMENTS = destroy
    IMPLEMENTS = reparse
    MEMBERS    = grib_expression *expression
@@ -42,7 +42,6 @@ or edit "action.class" and rerun ./make_class.pl
 
 static void init_class      (grib_action_class*);
 static void dump            (grib_action* d, FILE*,int);
-static void compile         (grib_action* a, grib_compiler* compiler);
 static void destroy         (grib_context*,grib_action*);
 static int create_accessor(grib_section*,grib_action*,grib_loader*);
 static grib_action* reparse(grib_action* a,grib_accessor* acc,int *doit);
@@ -75,7 +74,6 @@ static grib_action_class _grib_action_class_list = {
     0,                            /* notify_change */
     &reparse,                            /* reparse */
     0,                            /* execute */
-    &compile,                            /* compile */
 };
 
 grib_action_class* grib_action_class_list = &_grib_action_class_list;
@@ -90,122 +88,102 @@ static void init_class(grib_action_class* c)
 
 static void dump( grib_action* act, FILE* f, int lvl)
 {
-	grib_action_list* a = ( grib_action_list*)act;
-	int i = 0;
-	for (i=0;i<lvl;i++)   grib_context_print(act->context,f,"     ");
-	grib_context_print(act->context,f,"Loop   %s\n", act->name );
-	grib_dump_action_branch(f,a->block_list,lvl+1);
+    grib_action_list* a = ( grib_action_list*)act;
+    int i = 0;
+    for (i=0;i<lvl;i++)   grib_context_print(act->context,f,"     ");
+    grib_context_print(act->context,f,"Loop   %s\n", act->name );
+    grib_dump_action_branch(f,a->block_list,lvl+1);
 }
-
 
 static int create_accessor(grib_section* p, grib_action* act,grib_loader* h)
 {
-	grib_action_list* a = ( grib_action_list*)act;
+    grib_action_list* a = ( grib_action_list*)act;
 
-	grib_accessor* ga = NULL;
-	grib_section*  gs = NULL;
-	grib_action*  la = NULL;
-	grib_action*  next = NULL;
-	int ret = 0;
-	long val = 0;
+    grib_accessor* ga = NULL;
+    grib_section*  gs = NULL;
+    grib_action*  la = NULL;
+    grib_action*  next = NULL;
+    int ret = 0;
+    long val = 0;
 
-	if ((ret=grib_expression_evaluate_long(p->h,a->expression,&val)) != GRIB_SUCCESS){
-		grib_context_log(p->h->context, GRIB_LOG_DEBUG, " List %s creating %d values unable to evaluate long \n", act->name, val );
-		return ret;
-	}
+    if ((ret=grib_expression_evaluate_long(p->h,a->expression,&val)) != GRIB_SUCCESS){
+        grib_context_log(p->h->context, GRIB_LOG_DEBUG, " List %s creating %d values unable to evaluate long \n", act->name, val );
+        return ret;
+    }
 
-	grib_context_log(p->h->context, GRIB_LOG_DEBUG, " List %s creating %d values \n", act->name, val );
+    grib_context_log(p->h->context, GRIB_LOG_DEBUG, " List %s creating %d values \n", act->name, val );
 
-	ga = grib_accessor_factory(p, act,0,NULL);
-	if(!ga)  return GRIB_BUFFER_TOO_SMALL;
-	gs = ga->sub_section;
-	ga->loop = val;
+    ga = grib_accessor_factory(p, act,0,NULL);
+    if(!ga)  return GRIB_BUFFER_TOO_SMALL;
+    gs = ga->sub_section;
+    ga->loop = val;
 
+    grib_push_accessor(ga,p->block);
 
-	grib_push_accessor(ga,p->block);
+    la = a->block_list;
 
-	la = a->block_list;
+    gs->branch = la;
+    grib_dependency_observe_expression(ga,a->expression);
 
-	gs->branch = la;
-	grib_dependency_observe_expression(ga,a->expression);
-
-	while(val--){
-		next = la;
-		while(next){
-			ret =   grib_create_accessor(gs, next,h);
-			if(ret != GRIB_SUCCESS) return ret;
-			next= next->next;
-		}
-	}
-	return GRIB_SUCCESS;
-
+    while(val--){
+        next = la;
+        while(next){
+            ret =   grib_create_accessor(gs, next,h);
+            if(ret != GRIB_SUCCESS) return ret;
+            next= next->next;
+        }
+    }
+    return GRIB_SUCCESS;
 }
 
 grib_action* grib_action_create_list( grib_context* context, const char* name, grib_expression* expression, grib_action* block)
 {
-	grib_action_list* a ;
-	grib_action_class* c   = grib_action_class_list;
-	grib_action* act       = ( grib_action*)grib_context_malloc_clear_persistent(context,c->size);
-	act->cclass       = c;
-	act->context = context;
-	a                 = ( grib_action_list*)act;
-	act->next = NULL;
-	act->name =   grib_context_strdup_persistent(context,name);
-	act->op =   grib_context_strdup_persistent(context,"section");
-	a->expression =   expression;
+    grib_action_list* a ;
+    grib_action_class* c   = grib_action_class_list;
+    grib_action* act       = ( grib_action*)grib_context_malloc_clear_persistent(context,c->size);
+    act->cclass       = c;
+    act->context = context;
+    a                 = ( grib_action_list*)act;
+    act->next = NULL;
+    act->name =   grib_context_strdup_persistent(context,name);
+    act->op =   grib_context_strdup_persistent(context,"section");
+    a->expression =   expression;
 
-	a->block_list = block;
+    a->block_list = block;
 
-	grib_context_log(context, GRIB_LOG_DEBUG, " Action List %s is created  \n",act->name);
-	return act;
-}
-
-static void compile(grib_action* act, grib_compiler *compiler)
-{
-    grib_action_list* a  = (grib_action_list*)act;
-    char b[80];
-
-    if(a->block_list)
-        grib_compile_action_branch(a->block_list, compiler,b); 
-    else
-        strcpy(b,"NULL");
-
-    fprintf(compiler->out,"%s = grib_action_create_list(ctx,",compiler->var);
-    fprintf(compiler->out,"\"%s\",", act->name);
-    grib_compile_expression(a->expression, compiler);
-    fprintf(compiler->out,",%s);\n",b);
+    grib_context_log(context, GRIB_LOG_DEBUG, " Action List %s is created  \n",act->name);
+    return act;
 }
 
 static grib_action* reparse(grib_action* a,grib_accessor* acc,int *doit)
 {
-	grib_action_list* self = ( grib_action_list*)a;
+    grib_action_list* self = ( grib_action_list*)a;
 
-	int ret = 0;
-	long val = 0;
+    int ret = 0;
+    long val = 0;
 
-	if ((ret=grib_expression_evaluate_long(grib_handle_of_accessor(acc),self->expression,&val)) != GRIB_SUCCESS){
-		grib_context_log(acc->context, GRIB_LOG_ERROR, " List %s creating %d values unable to evaluate long \n", acc->name, val );
-	}
+    if ((ret=grib_expression_evaluate_long(grib_handle_of_accessor(acc),self->expression,&val)) != GRIB_SUCCESS){
+        grib_context_log(acc->context, GRIB_LOG_ERROR, " List %s creating %d values unable to evaluate long \n", acc->name, val );
+    }
 
-	*doit = (val != acc->loop);
+    *doit = (val != acc->loop);
 
-	return self->block_list;
+    return self->block_list;
 }
 
 static void destroy(grib_context* context,grib_action* act)
 {
-	grib_action_list* self = ( grib_action_list*)act;
-	grib_action *a = self->block_list;
+    grib_action_list* self = ( grib_action_list*)act;
+    grib_action *a = self->block_list;
 
-	while(a)
-	{
-		grib_action *na = a->next;
-		grib_action_delete(context,a);
-		a = na;
-	}
+    while(a)
+    {
+        grib_action *na = a->next;
+        grib_action_delete(context,a);
+        a = na;
+    }
 
-	grib_context_free_persistent(context, act->name);
-	grib_context_free_persistent(context, act->op);
-	grib_expression_free(context, self->expression);
-
+    grib_context_free_persistent(context, act->name);
+    grib_context_free_persistent(context, act->op);
+    grib_expression_free(context, self->expression);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -37,7 +37,7 @@ grib_option grib_options[]={
         {"x",0,0,0,1,0}
 };
 
-char* grib_tool_description="Dump the content of a grib file in different formats.";
+char* grib_tool_description="Dump the content of a GRIB file in different formats.";
 char* grib_tool_name="grib_dump";
 char* grib_tool_usage="[options] grib_file grib_file ...";
 static int json=0;

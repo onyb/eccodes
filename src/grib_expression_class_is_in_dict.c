@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -15,7 +15,6 @@
 
    START_CLASS_DEF
    CLASS      = expression
-   IMPLEMENTS = init_class
    IMPLEMENTS = native_type
    IMPLEMENTS = add_dependency
    IMPLEMENTS = get_name
@@ -23,7 +22,6 @@
    IMPLEMENTS = evaluate_double
    IMPLEMENTS = evaluate_string
    IMPLEMENTS = print
-   IMPLEMENTS = compile
    MEMBERS    = const char *key
    MEMBERS    = const char *dictionary
    END_CLASS_DEF
@@ -46,7 +44,6 @@ static void init_class              (grib_expression_class*);
 
 
 static void        print(grib_context*,grib_expression*,grib_handle*);
-static void        compile(grib_expression*,grib_compiler*);
 static void        add_dependency(grib_expression* e, grib_accessor* observer);
 static string get_name(grib_expression* e);
 
@@ -73,7 +70,6 @@ static grib_expression_class _grib_expression_class_is_in_dict = {
     0,                     /* constructor               */
     0,                  /* destructor                */
     &print,                 
-    &compile,                 
     &add_dependency,       
 
 	&native_type,
@@ -234,21 +230,9 @@ grib_expression* new_is_in_dict_expression(grib_context* c,const char* name,cons
   return (grib_expression*)e;
 }
 
-static void compile(grib_expression* g,grib_compiler* c)
-{
-	grib_expression_is_in_dict* e = (grib_expression_is_in_dict*)g;
-    fprintf(c->out,"new_is_in_dict_expression(ctx,\"%s\")",e->key);
-}
-
 static int native_type(grib_expression* g,grib_handle *h)
 {
-  grib_expression_is_in_dict* e = (grib_expression_is_in_dict*)g;
-  int type = 0;
-  int err;
-  if((err=grib_get_native_type(h,e->key,&type)) != GRIB_SUCCESS)
-    grib_context_log(h->context, GRIB_LOG_ERROR,
-    "Error in native_type %s : %s", e->key,grib_get_error_message(err));
-  return type;
+  return GRIB_TYPE_LONG;
 }
 
 static void  add_dependency(grib_expression* g, grib_accessor* observer){

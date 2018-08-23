@@ -1,4 +1,4 @@
-# (C) Copyright 1996-2016 ECMWF.
+# (C) Copyright 2011- ECMWF.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -94,7 +94,8 @@ function( ecbuild_generate_fortran_interfaces )
     if( _srcdir MATCHES "/$" )
       ecbuild_critical("ecbuild_generate_fortran_interfaces: directory ${_srcdir} must not end with /")
     endif()
-    ecbuild_list_add_pattern( LIST fortran_files SOURCE_DIR ${P_SOURCE_DIR} GLOB ${_srcdir}/*.F* )
+    ecbuild_list_add_pattern( LIST fortran_files SOURCE_DIR ${P_SOURCE_DIR}
+      GLOB ${_srcdir}/*.[fF] ${_srcdir}/*.[fF]90 ${_srcdir}/*.[fF]03 ${_srcdir}/*.[fF]08 QUIET )
   endforeach()
 
   string( REPLACE ";" " " _srcdirs "${P_DIRECTORIES}" )

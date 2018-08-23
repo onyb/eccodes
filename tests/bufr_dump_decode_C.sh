@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright 2005-2016 ECMWF.
+# Copyright 2005-2018 ECMWF.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -34,6 +34,9 @@ if command -v pkg-config >/dev/null 2>&1; then
     COMPILER=`pkg-config --variable=CC $PKGCONFIG_FILE`
     FLAGS_COMPILER=`pkg-config --cflags $PKGCONFIG_FILE`
     FLAGS_LINKER=`pkg-config --libs $PKGCONFIG_FILE`
+    #CMAKE_C_FLAGS=`grep CMAKE_C_FLAGS:STRING $CACHE_FILE | cut -d'=' -f2-`
+    #FLAGS_COMPILER="$FLAGS_COMPILER $CMAKE_C_FLAGS"
+    #FLAGS_COMPILER="$FLAGS_COMPILER  -fsanitize=memory"
 
     # The pkgconfig variables refer to the install directory. Change to build dir
     BUILD_DIR=`grep -w eccodes_BINARY_DIR $CACHE_FILE | cut -d'=' -f2`
@@ -58,7 +61,7 @@ do
   filePath=${data_dir}/bufr/$file
 
   # Generate C code from BUFR file
-  ${tools_dir}bufr_dump -DC $filePath > $tempSrc
+  ${tools_dir}/bufr_dump -DC $filePath > $tempSrc
 
   # Too large for this test
   if [ "$file" = "ias1_240.bufr" ]; then
@@ -74,8 +77,11 @@ do
 
     $COMPILER -o $tempExe $tempSrc -I${INCL_DIR1} -I${INCL_DIR2} $FLAGS_COMPILER $FLAGS_LINKER
 
-    # valgrind --error-exitcode=1  ./$tempExe
-    ./$tempExe $filePath
+    if test "x$ECCODES_TEST_WITH_VALGRIND" != "x"; then
+      valgrind --error-exitcode=1 -q ./$tempExe $filePath
+    else
+      ./$tempExe $filePath
+    fi
   fi
 
   rm -f $tempExe $tempSrc

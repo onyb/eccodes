@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -139,7 +139,7 @@ static void aliases(grib_dumper* d,grib_accessor* a)
 static void dump_long(grib_dumper* d,grib_accessor* a,const char* comment)
 {
     grib_dumper_default *self = (grib_dumper_default*)d;
-    long value; size_t size = 1;
+    long value=0; size_t size = 1;
     long *values=NULL;
     int err = 0;
     int i;
@@ -209,8 +209,8 @@ static void dump_bits(grib_dumper* d,grib_accessor* a,const char* comment)
 {
     grib_dumper_default *self = (grib_dumper_default*)d;
     int i;
-    long lvalue;
-    double dvalue;
+    long lvalue = 0;
+    double dvalue = 0;
     size_t size = 1;
     int err = 0;
     int isDouble=0;
@@ -409,8 +409,10 @@ static void dump_string(grib_dumper* d,grib_accessor* a,const char* comment)
     err = grib_unpack_string(a,value,&size);
     p=value;
 
-    if ( (a->flags & GRIB_ACCESSOR_FLAG_DUMP) == 0)
+    if ( (a->flags & GRIB_ACCESSOR_FLAG_DUMP) == 0) {
+        grib_context_free(c,value);
         return;
+    }
 
     while(*p) { if(!isprint(*p)) *p = '.'; p++; }
 

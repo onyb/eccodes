@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -151,7 +151,7 @@ static void dump(grib_accessor* a, grib_dumper* dumper)
     grib_dump_long(dumper,a,NULL);
 }
 
-static int    unpack_long   (grib_accessor* a, long* val, size_t *len)
+static int unpack_long(grib_accessor* a, long* val, size_t *len)
 {
     grib_accessor_unexpanded_descriptors* self = (grib_accessor_unexpanded_descriptors*)a;
     int ret=0;
@@ -167,7 +167,7 @@ static int    unpack_long   (grib_accessor* a, long* val, size_t *len)
     if (ret) return ret;
 
     if (rlen==0) {
-        grib_context_log(a->context,GRIB_LOG_FATAL,
+        grib_context_log(a->context,GRIB_LOG_ERROR,
                 "No descriptors in section 3. Malformed message.");
         return GRIB_MESSAGE_MALFORMED;
     }
@@ -190,13 +190,13 @@ static int    unpack_long   (grib_accessor* a, long* val, size_t *len)
     return GRIB_SUCCESS;
 }
 
-static int    pack_long   (grib_accessor* a, const long* val, size_t *len)
+static int pack_long(grib_accessor* a, const long* val, size_t *len)
 {
     grib_accessor_unexpanded_descriptors* self = (grib_accessor_unexpanded_descriptors*)a;
     int ret=0,i;
     long pos = 0;
     unsigned long f,x,y;
-    unsigned char* buf        = NULL;
+    unsigned char* buf = NULL;
     grib_accessor* expanded=NULL;
     size_t buflen=*len*2;
     long createNewData=1;
@@ -221,13 +221,16 @@ static int    pack_long   (grib_accessor* a, const long* val, size_t *len)
 
     expanded=grib_find_accessor(grib_handle_of_accessor(a),"expandedCodes");
     Assert(expanded!=NULL);
-    grib_accessor_class_expanded_descriptors_set_do_expand(expanded,1);
-    grib_set_long(grib_handle_of_accessor(a),"unpack",3);
-    grib_set_long(grib_handle_of_accessor(a),"unpack",1);
+    ret = grib_accessor_class_expanded_descriptors_set_do_expand(expanded,1);
+    if (ret != GRIB_SUCCESS) return ret;
+
+    ret = grib_set_long(grib_handle_of_accessor(a),"unpack",3);
+    if (ret != GRIB_SUCCESS) return ret;
+
+    ret = grib_set_long(grib_handle_of_accessor(a),"unpack",1);
 
     return ret;
 }
-
 
 static int value_count(grib_accessor* a,long* numberOfUnexpandedDescriptors)
 {
@@ -240,7 +243,8 @@ static int value_count(grib_accessor* a,long* numberOfUnexpandedDescriptors)
     return 0;
 }
 
-static long byte_offset(grib_accessor* a){
+static long byte_offset(grib_accessor* a)
+{
     return a->offset;
 }
 
@@ -249,7 +253,7 @@ static void update_size(grib_accessor* a,size_t s)
     a->length = s;
 }
 
-static long next_offset(grib_accessor* a){
+static long next_offset(grib_accessor* a)
+{
     return byte_offset(a)+a->length;
 }
-

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright 2005-2016 ECMWF.
+# Copyright 2005-2018 ECMWF.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -59,7 +59,7 @@ do
   filePath=${data_dir}/bufr/$file
 
   # Generate F90 code from BUFR file
-  ${tools_dir}bufr_dump -Dfortran ${filePath} > $tempSrc
+  ${tools_dir}/bufr_dump -Dfortran ${filePath} > $tempSrc
 
   # Too large for this test
   if [ "$file" = "ias1_240.bufr" ]; then

@@ -52,6 +52,7 @@ libeccodes_la_prototypes= \
 	grib_bufr_descriptors_array.c \
 	grib_darray.c \
 	grib_sarray.c \
+	grib_oarray.c \
 	grib_iarray.c \
 	grib_vdarray.c \
 	grib_vsarray.c \
@@ -64,6 +65,7 @@ libeccodes_la_prototypes= \
 	grib_accessor_class_bits.c  \
 	grib_accessor_class_bits_per_value.c \
 	grib_accessor_class_bufr_data.c \
+	grib_accessor_class_bufr_clear_tables.c \
 	grib_accessor_class_bufr_data_array.c \
 	grib_accessor_class_bufr_data_element.c \
 	grib_accessor_class_bufr_elements_table.c \
@@ -147,6 +149,7 @@ libeccodes_la_prototypes= \
 	grib_accessor_class_uint8.c \
 	grib_accessor_class_blob.c \
 	grib_accessor_class_julian_day.c \
+	grib_accessor_class_julian_date.c \
 	grib_accessor_class_latlonvalues.c \
 	grib_accessor_class_latitudes.c \
 	grib_accessor_class_longitudes.c \
@@ -154,6 +157,7 @@ libeccodes_la_prototypes= \
 	grib_accessor_class_octahedral_gaussian.c \
 	grib_accessor_class_offset_file.c \
 	grib_accessor_class_scale.c \
+	grib_accessor_class_rdbtime_guess_date.c \
 	grib_accessor_class_from_scale_factor_scaled_value.c \
 	grib_accessor_class_times.c \
 	grib_accessor_class_forward.c \
@@ -298,8 +302,8 @@ libeccodes_la_prototypes= \
 	grib_dumper_class_bufr_decode_filter.c \
 	grib_dumper_class_bufr_decode_fortran.c \
 	grib_dumper_class_bufr_decode_python.c \
+	grib_dumper_class_bufr_simple.c \
 	grib_dumper_class_json.c \
-	grib_dumper_class_xml.c \
 	grib_dumper_class_grib_encode_C.c \
 	grib_dumper_class_wmo.c \
 	grib_dumper_class.c \
@@ -313,9 +317,11 @@ libeccodes_la_prototypes= \
 	grib_hash_keys.c \
 	grib_io.c \
 	grib_trie.c \
+	grib_trie_with_rank.c \
 	grib_itrie.c \
 	grib_rules.c \
 	grib_keys_iterator.c \
+	bufr_keys_iterator.c \
 	grib_parse_utils.c \
 	grib_query.c \
 	grib_scaling.c \
@@ -324,6 +330,8 @@ libeccodes_la_prototypes= \
 	grib_value.c \
 	grib_errors.c \
 	grib_expression_class_binop.c \
+	grib_expression_class_logical_and.c \
+	grib_expression_class_logical_or.c \
 	grib_expression_class_is_in_dict.c \
 	grib_expression_class_true.c \
 	grib_expression_class_string_compare.c \
@@ -350,6 +358,7 @@ libeccodes_la_prototypes= \
 	grib_nearest_class_latlon_reduced.c \
 	grib_nearest_class_sh.c \
 	grib_nearest_class_lambert_conformal.c \
+	grib_nearest_class_polar_stereographic.c \
 	grib_iterator_class_polar_stereographic.c \
 	grib_iterator_class_lambert_azimuthal_equal_area.c  \
 	grib_iterator_class_lambert_conformal.c \
@@ -361,11 +370,14 @@ libeccodes_la_prototypes= \
 	grib_iterator_class_gen.c \
 	grib_iterator_class_latlon.c \
 	grib_iterator_class_regular.c \
+	grib_iterator_class_space_view.c \
 	grib_expression.c \
 	grib_util.c \
-	compile.c \
+	bufr_util.c \
+	string_util.c \
 	functions.c \
 	codes_memfs.c \
+	grib_optimize_decimal_factor.c \
 	grib_api_version.c
 
 libeccodes_extra_prototypes = grib_bits_any_endian.c grib_bits_any_endian_simple.c

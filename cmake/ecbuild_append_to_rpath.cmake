@@ -1,4 +1,4 @@
-# (C) Copyright 1996-2016 ECMWF.
+# (C) Copyright 2011- ECMWF.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -37,13 +37,13 @@ function( _path_append var path )
 endfunction()
 
 macro( ecbuild_append_to_rpath RPATH_DIRS )
-   
+
    if( NOT ${ARGC} EQUAL 1 )
      ecbuild_error( "ecbuild_append_to_rpath takes 1 argument")
    endif()
 
    foreach( RPATH_DIR ${RPATH_DIRS} )
-     
+
 		if( NOT ${RPATH_DIR} STREQUAL "" )
 
 			file( TO_CMAKE_PATH ${RPATH_DIR} RPATH_DIR ) # sanitize the path
@@ -67,7 +67,12 @@ macro( ecbuild_append_to_rpath RPATH_DIRS )
 
 				endif()
 
-				if( EC_OS_NAME STREQUAL "linux" )
+                if( EC_OS_NAME STREQUAL "freebsd" )
+                    _path_append( CMAKE_INSTALL_RPATH "$ORIGIN/${RPATH_DIR}" )
+                    set( _done 1 )
+                endif()
+
+                if( EC_OS_NAME STREQUAL "linux" )
 					_path_append( CMAKE_INSTALL_RPATH "$ORIGIN/${RPATH_DIR}" )
 					set( _done 1 )
 				endif()
@@ -77,10 +82,10 @@ macro( ecbuild_append_to_rpath RPATH_DIRS )
 					set( _done 1 )
 				endif()
 
-				if( EC_OS_NAME STREQUAL "aix" ) # always relative to exectuable path
-					_path_append( CMAKE_INSTALL_RPATH "${RPATH_DIR}" ) 
-					set( _done 1 )
-				endif()
+                if( EC_OS_NAME STREQUAL "aix" ) # always relative to exectuable path
+                    _path_append( CMAKE_INSTALL_RPATH "${RPATH_DIR}" )
+                    set( _done 1 )
+                endif()
 
 				# fallback
 

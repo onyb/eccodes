@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright 2005-2016 ECMWF.
+# Copyright 2005-2018 ECMWF.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -10,4 +10,5 @@
 
 . ./include.sh
 
-exec ${test_dir}/local_MeteoFrance
+${test_dir}/local_MeteoFrance
+rm -f output.local_MeteoFrance.grib

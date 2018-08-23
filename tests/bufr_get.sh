@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright 2005-2016 ECMWF.
+# Copyright 2005-2018 ECMWF.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -60,6 +60,13 @@ result=`${tools_dir}/bufr_get -s unpack=1 -p majorFrameCount aaen_55.bufr`
 result=`${tools_dir}/bufr_get -s unpack=1 -p satelliteIdentifier wavb_134.bufr`
 [ "$result" = "MISSING" ]
 
+#-------------------------------------------
+# ECC-315: BUFR keys in the MARS namespace
+#-------------------------------------------
+result=`${tools_dir}/bufr_get -m aaen_55.bufr`
+[ "$result" = "2 55 2012 11 2 0 0 8 209" ]
+result=`${tools_dir}/bufr_get -m syno_1.bufr`
+[ "$result" = "1 1 2012 10 30 0 0 0 7.45 151.83" ]
 
 #Clean up
 rm -f $fLog $fTmp $res_get

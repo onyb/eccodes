@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
                                               CODES_KEYS_ITERATOR_SKIP_DUPLICATES;
 
     /* Choose a namespace. E.g. "ls", "time", "parameter", "geography", "statistics" */
-    char* name_space="ls";
+    const char* name_space="ls";
 
     /* name_space=NULL to get all the keys */
     /* char* name_space=0; */

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright 2005-2016 ECMWF.
+# Copyright 2005-2018 ECMWF.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -46,9 +46,9 @@ do
     echo "Test: bufr_dump -Dfilter " >> $fLog
     echo "file: $f" >> $fLog
 
-    ${tools_dir}bufr_dump -Dfilter $f > $fRules
+    ${tools_dir}/bufr_dump -Dfilter $f > $fRules
 
-    ${tools_dir}bufr_filter $fRules $f >/dev/null
+    ${tools_dir}/codes_bufr_filter $fRules $f >/dev/null
 
     rm -f $fRules
   fi

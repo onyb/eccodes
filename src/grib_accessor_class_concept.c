@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -139,6 +139,8 @@ static void init_class(grib_accessor_class* c)
 
 #define MAX_CONCEPT_STRING_LENGTH 255
 
+/* Note: A fast cut-down version of strcmp which does NOT return -1 */
+/* 0 means input strings are equal and 1 means not equal */
 GRIB_INLINE static int grib_inline_strcmp(const char* a,const char* b)
 {
     if (*a != *b) return 1;
@@ -187,7 +189,7 @@ static int concept_condition_expression_true(grib_handle* h,grib_concept_conditi
     case GRIB_TYPE_STRING:
         ok = (grib_get_string(h,c->name,buf,&len) == GRIB_SUCCESS) &&
         ((cval = grib_expression_evaluate_string(h,c->expression,tmp,&size,&err)) != NULL) &&
-        (err==0) && (strcmp(buf,cval) == 0);
+        (err==0) && (grib_inline_strcmp(buf,cval) == 0);
         break;
 
     default:

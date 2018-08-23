@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -36,7 +36,7 @@ char* grib_tool_description="List content of GTS files printing values of "
         "some keys.\n\tIt does not fail when a key is not found.";
 char* grib_tool_name="gts_ls";
 char* grib_tool_usage="[options] file file ...";
-static char* new_handle="";
+/*static char* new_handle="";*/
 
 int grib_options_count=sizeof(grib_options)/sizeof(grib_option);
 int mode=0;
@@ -95,7 +95,7 @@ int grib_tool_new_handle_action(grib_runtime_options* options, grib_handle* h)
         if( err != GRIB_SUCCESS && options->fail) exit(err);
     }
 
-    new_handle="\n,";
+    /*new_handle="\n,";*/
     return 0;
 }
 

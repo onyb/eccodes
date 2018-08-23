@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -54,6 +54,15 @@ static void grib2_build_message ( grib_context* context,unsigned char* sections[
 static grib_multi_support* grib_get_multi_support ( grib_context* c, FILE* f );
 static grib_multi_support* grib_multi_support_new ( grib_context* c );
 static grib_handle* grib_handle_new_multi ( grib_context* c,unsigned char** idata, size_t *buflen,int* error );
+
+/* Note: A fast cut-down version of strcmp which does NOT return -1 */
+/* 0 means input strings are equal and 1 means not equal */
+static GRIB_INLINE int grib_inline_strcmp(const char* a,const char* b)
+{
+    if (*a != *b) return 1;
+    while((*a!=0 && *b!=0) &&  *(a) == *(b) ) {a++;b++;}
+    return (*a==0 && *b==0) ? 0 : 1;
+}
 
 grib_section* grib_section_create ( grib_handle* h,grib_accessor* owner )
 {
@@ -206,14 +215,14 @@ static grib_handle* grib_handle_create ( grib_handle  *gl, grib_context* c, cons
 
     if ( !gl->root )
     {
-        grib_context_log ( c, GRIB_LOG_ERROR, "grib_handle_new_from_message: cannot create root section" );
+        grib_context_log ( c, GRIB_LOG_ERROR, "grib_handle_create: cannot create root section" );
         grib_handle_delete ( gl );
         return NULL;
     }
 
     if ( !gl->context->grib_reader || !gl->context->grib_reader->first )
     {
-        grib_context_log ( c, GRIB_LOG_ERROR, "grib_handle_new_from_message: cannot create handle, no definitions found" );
+        grib_context_log ( c, GRIB_LOG_ERROR, "grib_handle_create: cannot create handle, no definitions found" );
         grib_handle_delete ( gl );
         return NULL;
     }
@@ -240,7 +249,7 @@ static grib_handle* grib_handle_create ( grib_handle  *gl, grib_context* c, cons
     return gl;
 }
 
-grib_handle* grib_handle_new_from_samples ( grib_context* c, const char* name )
+grib_handle* grib_handle_new_from_samples( grib_context* c, const char* name )
 {
     grib_handle* g = 0;
     if ( c == NULL ) c = grib_context_get_default();
@@ -255,7 +264,7 @@ grib_handle* grib_handle_new_from_samples ( grib_context* c, const char* name )
         printf("ECCODES DEBUG: grib_handle_new_from_samples '%s'\n", name);
     }
 
-    g=grib_external_template ( c,name );
+    g = grib_external_template( c,name );
     if ( !g )
         grib_context_log ( c,GRIB_LOG_ERROR,"Unable to load sample file %s.tmpl\n                    in %s",
                 name, c->grib_samples_path );
@@ -317,7 +326,9 @@ int grib_write_message(grib_handle* h,const char* file,const char* mode)
 
 grib_handle* grib_handle_clone ( grib_handle* h )
 {
-    return grib_handle_new_from_message_copy ( h->context, h->buffer->data, h->buffer->ulength );
+    grib_handle* result = grib_handle_new_from_message_copy ( h->context, h->buffer->data, h->buffer->ulength );
+    result->product_kind = h->product_kind;
+    return result;
 }
 
 grib_handle* codes_handle_new_from_file(grib_context* c, FILE* f, ProductKind product, int* error)
@@ -352,6 +363,24 @@ grib_handle* codes_metar_handle_new_from_file(grib_context* c, FILE* f, int* err
 grib_handle* codes_gts_handle_new_from_file(grib_context* c, FILE* f, int* error)
 {
     return gts_new_from_file(c, f, error);
+}
+
+static int determine_product_kind(grib_handle* h, ProductKind* prod_kind)
+{
+    int err = 0;
+    size_t len = 0;
+    char prod_kind_str[256]={0,};
+    err = grib_get_length(h, "kindOfProduct", &len);
+    if (!err) {
+        err = grib_get_string(h, "kindOfProduct", prod_kind_str, &len);
+        if      (grib_inline_strcmp(prod_kind_str, "GRIB")==0)  *prod_kind = PRODUCT_GRIB;
+        else if (grib_inline_strcmp(prod_kind_str, "BUFR")==0)  *prod_kind = PRODUCT_BUFR;
+        else if (grib_inline_strcmp(prod_kind_str, "METAR")==0) *prod_kind = PRODUCT_METAR;
+        else if (grib_inline_strcmp(prod_kind_str, "GTS")==0)   *prod_kind = PRODUCT_GTS;
+        else if (grib_inline_strcmp(prod_kind_str, "TAF")==0)   *prod_kind = PRODUCT_TAF;
+        else *prod_kind = PRODUCT_ANY;
+    }
+    return err;
 }
 
 grib_handle* grib_handle_new_from_message_copy ( grib_context* c, const void* data, size_t size )
@@ -394,7 +423,7 @@ grib_handle* grib_handle_new_from_partial_message_copy ( grib_context* c, const 
     return g;
 }
 
-grib_handle* grib_handle_new_from_partial_message ( grib_context* c,void* data, size_t buflen )
+grib_handle* grib_handle_new_from_partial_message ( grib_context* c, const void* data, size_t buflen )
 {
     grib_handle  *gl = NULL;
     if ( c == NULL ) c = grib_context_get_default();
@@ -409,9 +438,16 @@ grib_handle* grib_handle_new_from_message ( grib_context* c, const void* data, s
 {
     grib_handle  *gl = NULL;
     grib_handle  *h = NULL;
+    ProductKind product_kind = PRODUCT_ANY;
     if ( c == NULL ) c = grib_context_get_default();
     gl = grib_new_handle ( c );
+    gl->product_kind = PRODUCT_GRIB; /* See ECC-480 */
     h=grib_handle_create ( gl,  c, data,  buflen );
+
+    /* See ECC-448 */
+    if (determine_product_kind(h, &product_kind) == GRIB_SUCCESS) {
+        h->product_kind = product_kind;
+    }
     return h;
 }
 
@@ -549,6 +585,11 @@ static grib_handle* grib_handle_new_multi ( grib_context* c,unsigned char** data
             }
         }
 
+    }
+    else if (edition == 3)
+    {
+        *error = GRIB_UNSUPPORTED_EDITION;
+        return NULL;
     }
     else
     {
@@ -707,6 +748,13 @@ static grib_handle* grib_handle_new_from_file_multi ( grib_context* c, FILE* f,i
         }
 
     }
+    else if (edition == 3)
+    {
+        /* GRIB3: Multi-field mode not yet supported */
+        printf("WARNING: %s\n", "grib_handle_new_from_file_multi: GRIB3 multi-field mode not yet implemented! Reverting to single-field mode");
+        gm->message_length=0;
+        gm->message=NULL;
+    }
     else
     {
         gm->message_length=0;
@@ -798,6 +846,7 @@ grib_handle* gts_new_from_file( grib_context* c, FILE* f,int *error )
     gl->product_kind = PRODUCT_GTS;
     grib_context_increment_handle_file_count(c);
     grib_context_increment_handle_total_count(c);
+    if (gl->offset == 0) grib_context_set_handle_file_count(c,1);
 
     return gl;
 }
@@ -836,6 +885,7 @@ grib_handle* taf_new_from_file( grib_context* c, FILE* f,int *error )
     gl->product_kind = PRODUCT_TAF;
     grib_context_increment_handle_file_count(c);
     grib_context_increment_handle_total_count(c);
+    if (gl->offset == 0) grib_context_set_handle_file_count(c,1);
 
     return gl;
 }
@@ -874,6 +924,7 @@ grib_handle* metar_new_from_file( grib_context* c, FILE* f,int *error )
     gl->product_kind = PRODUCT_METAR;
     grib_context_increment_handle_file_count(c);
     grib_context_increment_handle_total_count(c);
+    if (gl->offset == 0) grib_context_set_handle_file_count(c,1);
 
     return gl;
 }
@@ -912,6 +963,7 @@ grib_handle* bufr_new_from_file( grib_context* c, FILE* f,int *error )
     gl->product_kind = PRODUCT_BUFR;
     grib_context_increment_handle_file_count(c);
     grib_context_increment_handle_total_count(c);
+    if (gl->offset == 0) grib_context_set_handle_file_count(c,1);
 
     return gl;
 }
@@ -950,6 +1002,7 @@ grib_handle* any_new_from_file( grib_context* c, FILE* f,int *error )
     gl->product_kind = PRODUCT_ANY;
     grib_context_increment_handle_file_count(c);
     grib_context_increment_handle_total_count(c);
+    if (gl->offset == 0) grib_context_set_handle_file_count(c,1);
 
     return gl;
 }
@@ -1245,14 +1298,14 @@ grib_handle *grib_handle_new ( grib_context* c )
 
     if ( !h->root )
     {
-        grib_context_log ( c, GRIB_LOG_ERROR, "grib_handle_new_from_message: cannot create root section" );
+        grib_context_log ( c, GRIB_LOG_ERROR, "grib_handle_new: cannot create root section" );
         grib_handle_delete ( h );
         return NULL;
     }
 
     if ( !h->context->grib_reader || !h->context->grib_reader->first )
     {
-        grib_context_log ( c, GRIB_LOG_ERROR, "grib_handle_new_from_message: cannot create handle, no definitions found" );
+        grib_context_log ( c, GRIB_LOG_ERROR, "grib_handle_new: cannot create handle, no definitions found" );
         grib_handle_delete ( h );
         return NULL;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -42,7 +42,7 @@ grib_option grib_options[]={
     {"x",0,0,0,1,0}
 };
 
-char* grib_tool_description="List content of grib files printing values of "
+char* grib_tool_description="List content of GRIB files printing values of "
         "some keys.\n\tIt does not fail when a key is not found.";
 char* grib_tool_name="grib_ls";
 char* grib_tool_usage="[options] grib_file grib_file ...";
@@ -268,8 +268,8 @@ int grib_tool_new_handle_action(grib_runtime_options* options, grib_handle* h)
     }
 
     if (options->latlon) {
-        int err=0;
         double min;
+        err=0;
         if (!n) n=grib_nearest_new(h,&err);
         if (err == GRIB_NOT_IMPLEMENTED) {
             char grid_type[100];
@@ -280,9 +280,15 @@ int grib_tool_new_handle_action(grib_runtime_options* options, grib_handle* h)
             }
         }
         GRIB_CHECK_NOLINE(err,0);
-        GRIB_CHECK_NOLINE(grib_nearest_find(n,h,lat,lon,0,
+        {
+            int nn_flag = 0;
+            if (options->latlon_mask) {
+                nn_flag = mode; /* ECC-638 */
+            }
+            GRIB_CHECK_NOLINE(grib_nearest_find(n,h,lat,lon,nn_flag,
                 options->lats,options->lons,options->values,
                 options->distances,options->indexes,&size),0);
+        }
 
         if (!options->latlon_mask) {
             min=options->distances[0];

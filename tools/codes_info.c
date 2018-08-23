@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -10,7 +10,10 @@
 
 #include "grib_tools.h"
 
-void usage( char*);
+static void usage_and_exit(const char* progname) {
+    printf("\nUsage: %s [-v] [-d] [-s]\n",progname);
+    exit(1);
+}
 
 #define INFO_PRINT_ALL              0
 #define INFO_PRINT_VERSION          (1<<0)
@@ -43,25 +46,31 @@ int main( int argc,char* argv[])
             print_flags|=INFO_PRINT_SAMPLES_PATH;
             break;
         default:
-            usage(argv[0]);
+            usage_and_exit(argv[0]);
         }
     }
 
     nfiles=argc-optind;
-    if (nfiles != 0) usage(argv[0]);
+    if (nfiles != 0) usage_and_exit(argv[0]);
 
     if (print_flags ==  INFO_PRINT_ALL) {
+        grib_context* context = grib_context_get_default();
         printf("\n");
-        printf("eccodes Version %d.%d.%d",
-                major,minor,revision);
+        printf("%s Version %d.%d.%d",
+                grib_get_package_name(), major,minor,revision);
         /* if (ECCODES_MAJOR_VERSION < 1) printf(" PRE-RELEASE"); */
         printf("\n");
         printf("\n");
+        if(context->debug) {
+            grib_context_log(context, GRIB_LOG_DEBUG, "Git SHA1=%s", grib_get_git_sha1());
+        }
 #if GRIB_PTHREADS
-        grib_context_log(grib_context_get_default(), GRIB_LOG_DEBUG, "PTHREADS enabled");
+        grib_context_log(context, GRIB_LOG_DEBUG, "POSIX threads enabled\n");
+#elif GRIB_OMP_THREADS
+        grib_context_log(context, GRIB_LOG_DEBUG, "OMP threads enabled\n");
 #endif
 #ifdef HAVE_MEMFS
-        grib_context_log(grib_context_get_default(), GRIB_LOG_DEBUG, "MEMFS enabled");
+        grib_context_log(context, GRIB_LOG_DEBUG, "MEMFS enabled");
 #endif
         if ((path=getenv("ECCODES_DEFINITION_PATH")) != NULL) {
             printf("Definition files path from environment variable");
@@ -113,9 +122,4 @@ int main( int argc,char* argv[])
     }
 
     return 0;
-}
-
-void usage(char* progname) {
-    printf("\nUsage: %s [-v] [-d] [-s]\n",progname);
-    exit(1);
 }

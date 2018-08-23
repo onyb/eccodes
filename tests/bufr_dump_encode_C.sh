@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright 2005-2016 ECMWF.
+# Copyright 2005-2018 ECMWF.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -35,6 +35,8 @@ if command -v pkg-config >/dev/null 2>&1; then
     COMPILER=`pkg-config --variable=CC $PKGCONFIG_FILE`
     FLAGS_COMPILER=`pkg-config --cflags $PKGCONFIG_FILE`
     FLAGS_LINKER=`pkg-config --libs $PKGCONFIG_FILE`
+    #CMAKE_C_FLAGS=`grep CMAKE_C_FLAGS:STRING $CACHE_FILE | cut -d'=' -f2-`
+    #FLAGS_COMPILER="$FLAGS_COMPILER  -fsanitize=memory"
 
     # The pkgconfig variables refer to the install directory. Change to build dir
     BUILD_DIR=`grep -w eccodes_BINARY_DIR $CACHE_FILE | cut -d'=' -f2`
@@ -58,7 +60,7 @@ do
   tempExe=$label.$file.exe
 
   # Generate C code from BUFR file
-  ${tools_dir}bufr_dump -EC ${data_dir}/bufr/$file > $tempSrc
+  ${tools_dir}/bufr_dump -EC ${data_dir}/bufr/$file > $tempSrc
 
   # Too large for this test
   if [ "$file" = "ias1_240.bufr" ]; then
@@ -75,16 +77,19 @@ do
     $COMPILER -o $tempExe $tempSrc -I${INCL_DIR1} -I${INCL_DIR2} $FLAGS_COMPILER $FLAGS_LINKER
 
     # The executable always creates a file called outfile.bufr
-    # valgrind --error-exitcode=1  ./$tempExe
-    ./$tempExe
-    ${tools_dir}bufr_compare ${data_dir}/bufr/$file $tempBufr
+    if test "x$ECCODES_TEST_WITH_VALGRIND" != "x"; then
+      valgrind --error-exitcode=1 -q ./$tempExe
+    else
+      ./$tempExe
+    fi
+    ${tools_dir}/bufr_compare ${data_dir}/bufr/$file $tempBufr
 
-    TEMP_JSON1=${label}.$file.json
-    TEMP_JSON2=${label}.$tempBufr.json
-    ${tools_dir}bufr_dump ${data_dir}/bufr/$file > $TEMP_JSON1
-    ${tools_dir}bufr_dump $tempBufr              > $TEMP_JSON2
-    diff $TEMP_JSON1 $TEMP_JSON2
-    rm -f $TEMP_JSON1 $TEMP_JSON2
+    TEMP_OUT1=${label}.$file.dump.out
+    TEMP_OUT2=${label}.$tempBufr.dump.out
+    ${tools_dir}/bufr_dump -p ${data_dir}/bufr/$file > $TEMP_OUT1
+    ${tools_dir}/bufr_dump -p $tempBufr              > $TEMP_OUT2
+    diff $TEMP_OUT1 $TEMP_OUT2
+    rm -f $TEMP_OUT1 $TEMP_OUT2
   fi
 
   rm -f $tempExe $tempSrc $tempBufr

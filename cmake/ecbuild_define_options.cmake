@@ -1,4 +1,4 @@
-# (C) Copyright 1996-2016 ECMWF.
+# (C) Copyright 2011- ECMWF.
 #
 # This software is licensed under the terms of the Apache Licence Version 2.0
 # which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -20,10 +20,6 @@ option( ENABLE_PROFILING        "build with profiling support" OFF )
 
 mark_as_advanced( ENABLE_LARGE_FILE_SUPPORT )
 
-option( ENABLE_OS_TESTS          "Run all OS tests" ON )
-
-mark_as_advanced( ENABLE_OS_TESTS )
-
 option( ENABLE_FORTRAN_C_INTERFACE "Enable Fortran/C Interface" OFF )
 mark_as_advanced( ENABLE_FORTRAN_C_INTERFACE )
 
@@ -33,13 +29,13 @@ option( CHECK_UNUSED_FILES       "check for unused project files (slow)"  OFF )
 mark_as_advanced( DEVELOPER_MODE  )
 mark_as_advanced( CHECK_UNUSED_FILES  )
 
+option( ECBUILD_INSTALL_LIBRARY_HEADERS "Will install library headers" ON )
+mark_as_advanced( ECBUILD_INSTALL_LIBRARY_HEADERS )
+
+option( ECBUILD_INSTALL_FORTRAN_MODULES "Will install Fortran modules" ON )
+mark_as_advanced( ECBUILD_INSTALL_FORTRAN_MODULES )
+
 include( CMakeDependentOption ) # make options depend on one another
-
-cmake_dependent_option( ENABLE_OS_TYPES_TEST     "Run sizeof tests on C types" ON "ENABLE_OS_TESTS" OFF)
-cmake_dependent_option( ENABLE_OS_ENDINESS_TEST  "Run OS endiness tests"       ON "ENABLE_OS_TESTS" OFF)
-cmake_dependent_option( ENABLE_OS_FUNCTIONS_TEST "Run OS functions tests"      ON "ENABLE_OS_TESTS" OFF)
-
-mark_as_advanced( ENABLE_OS_TYPES_TEST ENABLE_OS_ENDINESS_TEST ENABLE_OS_FUNCTIONS_TEST  )
 
 option( ECBUILD_USE_INCLUDE_DIRECTORIES "Forces to use global include_directories() instead of target specific. Adverse effect on PkgConfig generation." OFF )
 

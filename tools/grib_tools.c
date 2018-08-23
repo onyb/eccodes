@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -21,7 +21,6 @@
 #undef PACKAGE_STRING
 #undef PACKAGE_TARNAME
 #undef PACKAGE_VERSION
-#include "jasper/jasper.h"
 #endif
 
 #ifdef ENABLE_FLOATING_POINT_EXCEPTIONS
@@ -117,23 +116,23 @@ grib_runtime_options global_options={
 
 static grib_handle* grib_handle_new_from_file_x(grib_context* c,FILE* f,int mode,int headers_only,int *err)
 {
+    if (mode==MODE_GRIB)
+        return grib_new_from_file(c,f,headers_only,err);
+
+    if (mode==MODE_BUFR)
+        return bufr_new_from_file(c,f,err);
+
     if (mode==MODE_ANY)
         return any_new_from_file(c,f,err);
 
     if (mode==MODE_GTS)
         return gts_new_from_file(c,f,err);
 
-    if (mode==MODE_BUFR)
-        return bufr_new_from_file(c,f,err);
-
     if (mode==MODE_METAR)
         return metar_new_from_file(c,f,err);
 
     if (mode==MODE_TAF)
         return taf_new_from_file(c,f,err);
-
-    if (mode==MODE_GRIB)
-        return grib_new_from_file(c,f,headers_only,err);
 
     Assert(!"grib_handle_new_from_file_x: unknown mode");
     return NULL;
@@ -193,15 +192,13 @@ static int grib_tool_with_orderby(grib_runtime_options* options)
     int err=0;
     grib_failed *failed=NULL,*p=NULL;
     grib_handle* h=NULL;
-    grib_context* c=NULL;
-    grib_tools_file* infile=NULL;
+    grib_tools_file* infile=options->infile;
     char** filenames;
     size_t files_count=0;
     grib_fieldset* set=NULL;
     int i=0;
-    c=grib_context_get_default();
+    grib_context* c=grib_context_get_default();
 
-    infile=options->infile;
     if(infile) infile->failed=NULL;
 
     files_count=0;
@@ -216,8 +213,8 @@ static int grib_tool_with_orderby(grib_runtime_options* options)
 
     set=grib_fieldset_new_from_files(0,filenames,files_count,0,0,0,options->orderby,&err);
     if (err) {
-        grib_context_log(c,GRIB_LOG_FATAL,"unable to create index for input file %s (%s)",
-                filenames[0],grib_get_error_message(err));
+        grib_context_log(c,GRIB_LOG_ERROR,"unable to create index for input file %s (%s)",
+                         filenames[0],grib_get_error_message(err));
         exit(err);
     }
 
@@ -275,15 +272,13 @@ static int grib_tool_without_orderby(grib_runtime_options* options)
     /*int nofail=0;*/
     grib_failed *failed=NULL,*p=NULL;
     grib_handle* h=NULL;
-    grib_context* c=NULL;
-    grib_tools_file* infile=NULL;
+    grib_tools_file* infile=options->infile;
 
-    c=grib_context_get_default();
+    grib_context* c=grib_context_get_default();
     options->file_count=0;
     options->handle_count=0;
     options->filter_handle_count=0;
     options->current_infile=options->infile;
-    infile=options->infile;
     infile->failed=NULL;
 
     if (grib_options_on("7")) c->no_fail_on_wrong_length=1;
@@ -291,7 +286,10 @@ static int grib_tool_without_orderby(grib_runtime_options* options)
     while (infile!=NULL && infile->name!=NULL) {
 
         if (options->print_statistics && options->verbose) fprintf(dump_file,"%s\n",infile->name);
-        infile->file = fopen(infile->name,"r");
+        if (strcmp(infile->name,"-")==0)
+            infile->file = stdin;
+        else
+            infile->file = fopen(infile->name,"r");
         if(!infile->file) {
             perror(infile->name);
             exit(1);
@@ -425,13 +423,12 @@ static int navigate(grib_field_tree* fields,grib_runtime_options* options)
 static int grib_tool_index(grib_runtime_options* options)
 {
     int err=0;
-    grib_context* c=NULL;
     char* f1=options->infile->name;
     char* f2=options->infile_extra->name;
     grib_index_key *k1,*k2;
     int found=0;
 
-    c=grib_context_get_default();
+    grib_context* c=grib_context_get_default();
 
     options->index1=grib_index_read(c,f1,&err);
     if (err)
@@ -597,11 +594,8 @@ static int process(grib_context* c,grib_runtime_options* options,const char* pat
 
 static int grib_tool_onlyfiles(grib_runtime_options* options)
 {
-    grib_context* c=NULL;
-    grib_tools_file* infile=NULL;
-
-    c=grib_context_get_default();
-    infile=options->infile;
+    grib_context* c=grib_context_get_default();
+    grib_tools_file* infile=options->infile;
 
     while (infile!=NULL && infile->name!=NULL) {
 
@@ -658,6 +652,14 @@ static void grib_print_header(grib_runtime_options* options,grib_handle* h)
     }
 }
 
+static int cmpstringp(const void *p1, const void *p2)
+{
+    /* The actual arguments to this function are "pointers to
+       pointers to char", but strcmp(3) arguments are "pointers
+       to char", hence the following cast plus dereference */
+    return strcmp(* (char * const *) p1, * (char * const *) p2);
+}
+
 static void grib_tools_set_print_keys(grib_runtime_options* options, grib_handle* h, const char* ns)
 {
     int i=0;
@@ -674,7 +676,7 @@ static void grib_tools_set_print_keys(grib_runtime_options* options, grib_handle
     }
 
     if (ns) {
-        kiter=grib_keys_iterator_new(h,0,(char*)ns);
+        kiter=grib_keys_iterator_new(h,0,ns);
         if (!kiter) {
             fprintf(dump_file,"ERROR: Unable to create keys iterator\n");
             exit(1);
@@ -698,7 +700,32 @@ static void grib_tools_set_print_keys(grib_runtime_options* options, grib_handle
 
         grib_keys_iterator_delete(kiter);
         if (options->print_keys_count==0 && options->latlon == 0 ) {
-            printf("ERROR: namespace \"%s\" does not contain any key\n",ns);
+            int j=0,k=0,ns_count=0;
+            char* all_namespace_vals[1024] = {NULL,}; /* sorted array containing all namespaces */
+            printf("ERROR: namespace \"%s\" does not contain any key.\n",ns);
+            printf("Here are the available namespaces in this message:\n");
+            for (i=0; i<ACCESSORS_ARRAY_SIZE; i++) {
+                grib_accessor* anAccessor = h->accessors[i];
+                if (anAccessor) {
+                    for (j=0; j<MAX_ACCESSOR_NAMES; j++) {
+                        char* a_namespace = (char*)anAccessor->all_name_spaces[j];
+                        if (a_namespace) {
+                            all_namespace_vals[k++] = a_namespace;
+                            ns_count++;
+                        }
+                    }
+                }
+            }
+            qsort(&all_namespace_vals, ns_count, sizeof(char*), cmpstringp);
+            for(i=0; i<ns_count; ++i) {
+                if (all_namespace_vals[i]) {
+                    int print_it = 1;
+                    if (i>0 && strcmp(all_namespace_vals[i], all_namespace_vals[i-1]) == 0) {
+                        print_it = 0;  /* skip duplicate entries */
+                    }
+                    if (print_it) printf("\t%s\n", all_namespace_vals[i]);
+                }
+            }
             exit(1);
         }
     }
@@ -786,6 +813,17 @@ void grib_skip_check(grib_runtime_options* options,grib_handle* h)
     }
 }
 
+/* See ECC-707 */
+static int fix_for_lsdate_needed(grib_handle* h)
+{
+    long lsdate_bug = 0;
+    int err = grib_get_long(h, "lsdate_bug", &lsdate_bug);
+    if (!err && lsdate_bug == 1) {
+        return 1;
+    }
+    return 0;
+}
+
 void grib_print_key_values(grib_runtime_options* options, grib_handle* h)
 {
     int i=0;
@@ -837,15 +875,22 @@ void grib_print_key_values(grib_runtime_options* options, grib_handle* h)
             }
         } else {
             /* Other products e.g. GRIB */
+            const int fix_lsdate = (fix_for_lsdate_needed(h) && options->name_space && strcmp(options->name_space,"ls")==0);
+
             if (grib_is_missing(h,options->print_keys[i].name,&ret) && ret==GRIB_SUCCESS) {
                 sprintf(value,"MISSING");
             }
             else if ( ret == GRIB_SUCCESS ) {
+                const char* pName = NULL;
                 if (options->print_keys[i].type == GRIB_TYPE_UNDEFINED)
                     grib_get_native_type(h,options->print_keys[i].name,&(options->print_keys[i].type));
                 switch (options->print_keys[i].type) {
                 case GRIB_TYPE_STRING:
-                    ret=grib_get_string( h,options->print_keys[i].name,value,&len);
+                    pName = options->print_keys[i].name;
+                    if (fix_lsdate && strcmp(pName, "date")==0) { /* ECC-707 */
+                        pName = "ls.date";
+                    }
+                    ret=grib_get_string( h,pName,value,&len);
                     break;
                 case GRIB_TYPE_DOUBLE:
                     ret=grib_get_double( h,options->print_keys[i].name,&dvalue);
@@ -891,9 +936,9 @@ void grib_print_key_values(grib_runtime_options* options, grib_handle* h)
     if (options->latlon) {
 
         if (options->latlon_mode==4){
-            int i=0;
-            for (i=0;i<4;i++) {
-                fprintf(dump_file,options->format,options->values[i]);
+            int ii=0;
+            for (ii=0;ii<4;ii++) {
+                fprintf(dump_file,options->format,options->values[ii]);
                 fprintf(dump_file," ");
             }
             written_to_dump=1;

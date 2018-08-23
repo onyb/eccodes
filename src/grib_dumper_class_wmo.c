@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -139,11 +139,10 @@ static void aliases(grib_dumper* d,grib_accessor* a)
 static void dump_long(grib_dumper* d,grib_accessor* a,const char* comment)
 {
     grib_dumper_wmo *self = (grib_dumper_wmo*)d;
-    long value = 0; size_t size =0;
+    long value = 0; size_t size = 0;
     long *values=NULL;
-    int err = 0;
-    int i=0;
-    long count=0;
+    int err = 0, i = 0;
+    long count = 0;
 
     grib_value_count(a,&count);
     size=count;
@@ -249,7 +248,7 @@ static void dump_bits(grib_dumper* d,grib_accessor* a,const char* comment)
 static void dump_double(grib_dumper* d,grib_accessor* a,const char* comment)
 {
     grib_dumper_wmo *self = (grib_dumper_wmo*)d;
-    double value; size_t size = 1;
+    double value=0; size_t size = 1;
     int err = grib_unpack_double(a,&value,&size);
 
 
@@ -319,7 +318,7 @@ static void dump_string(grib_dumper* d,grib_accessor* a,const char* comment)
         fprintf(self->dumper.out," *** ERR=%d (%s) [grib_dumper_wmo::dump_string]",err,grib_get_error_message(err));
     aliases(d,a);
     fprintf(self->dumper.out,"\n");
-    if (value) grib_context_free(a->context,value);
+    grib_context_free(a->context,value);
 }
 
 static void dump_bytes(grib_dumper* d,grib_accessor* a,const char* comment)

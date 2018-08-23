@@ -71,7 +71,6 @@ end subroutine codes_index_add_file
 
   !> Get the number of distinct values of the key in argument contained in the index. The key must belong to the index.
   !>
-  !>
   !> In case of error, if the status parameter (optional) is not given, the program will
   !> exit with an error message.\n Otherwise the error message can be
   !> gathered with @ref codes_get_error_string.
@@ -368,7 +367,6 @@ end subroutine codes_index_release
 
   !> Open a file according to a mode.
   !>
-  !>
   !> In case of error, if the status parameter (optional) is not given, the program will
   !> exit with an error message.\n Otherwise the error message can be
   !> gathered with @ref codes_get_error_string.
@@ -377,7 +375,7 @@ end subroutine codes_index_release
   !>
   !> @param ifile       id of the opened file to be used in all the file functions.
   !> @param filename    name of the file to be open
-  !> @param mode        open mode can be 'r' (read only) or 'w' (write only)
+  !> @param mode        open mode can be 'r' (read) or 'w' (write)
   !> @param status      CODES_SUCCESS if OK, integer value on error
 subroutine codes_open_file ( ifile, filename, mode, status )
     integer(kind=kindOfInt),intent(out)               :: ifile
@@ -956,6 +954,96 @@ subroutine codes_new_from_file (ifile, msgid , product_kind, status)
     end if
 end subroutine codes_new_from_file
 
+  !> Scan a file to search for messages without decoding.
+  !>
+  !> @param ifile     id of the file opened with @ref codes_open_file
+  !> @param nmessages number of messages found
+  !> @param status    CODES_SUCCESS if OK, CODES_END_OF_FILE at the end of file, or error code
+subroutine codes_any_scan_file ( ifile, nmessages , status)
+    integer(kind=kindOfInt),intent(in)              :: ifile
+    integer(kind=kindOfInt),intent(out)          :: nmessages
+    integer(kind=kindOfInt)                       :: iret
+    integer(kind=kindOfInt),optional,intent(out)    :: status
+
+    iret=any_f_scan_file ( ifile, nmessages)
+    if (present(status)) then
+      status = iret
+    else
+      call grib_check(iret,'any_f_scan_file','')
+    endif
+
+end subroutine codes_any_scan_file 
+
+  !> Decode message from scanned file. This function provides direct access to the n-th message in a file.
+  !> A call to codes_any_scan_file must precede a call to this function. The file needs to be scanned to prepare
+  !> direct access by rank.
+  !>
+  !> The message can be accessed through its msgid and it will be available\n
+  !> until @ref codes_release is called.\n
+  !>
+  !> @param ifile     id of the file opened with @ref codes_open_file
+  !> @param nmsg      n-th message in the file to be read
+  !> @param msgid     id of the message loaded in memory
+  !> @param status    CODES_SUCCESS if OK, CODES_END_OF_FILE at the end of file, or error code
+subroutine codes_any_new_from_scanned_file ( ifile, nmsg, msgid , status)
+    integer(kind=kindOfInt),intent(in)              :: ifile
+    integer(kind=kindOfInt),intent(in)              :: nmsg
+    integer(kind=kindOfInt),intent(out)             :: msgid
+    integer(kind=kindOfInt)                       :: iret
+    integer(kind=kindOfInt),optional,intent(out)    :: status
+
+    iret=any_f_new_from_scanned_file( ifile, nmsg, msgid )
+    if (present(status)) then
+      status = iret
+    else
+      call grib_check(iret,'any_f_new_from_scanned_file','')
+    endif
+
+end subroutine codes_any_new_from_scanned_file 
+
+  !> Load in memory all messages from a file without decoding.
+  !>
+  !> @param ifile     id of the file opened with @ref codes_open_file
+  !> @param nmessages number of messages loaded
+  !> @param status    CODES_SUCCESS if OK, CODES_END_OF_FILE at the end of file, or error code
+subroutine codes_any_load_all_from_file ( ifile, nmessages , status)
+    integer(kind=kindOfInt),intent(in)              :: ifile
+    integer(kind=kindOfInt),intent(out)          :: nmessages
+    integer(kind=kindOfInt)                       :: iret
+    integer(kind=kindOfInt),optional,intent(out)    :: status
+
+    iret=any_f_load_all_from_file ( ifile, nmessages)
+    if (present(status)) then
+      status = iret
+    else
+      call grib_check(iret,'any_f_load_all_from_file','')
+    endif
+
+end subroutine codes_any_load_all_from_file 
+
+  !> Decode message from loaded.
+  !>
+  !> The message can be accessed through its msgid and it will be available\n
+  !> until @ref codes_release is called.\n
+  !>
+  !> @param imsg      id of the binary message 
+  !> @param msgid     id of the message loaded in memory
+  !> @param status    CODES_SUCCESS if OK, CODES_END_OF_FILE at the end of file, or error code
+subroutine codes_any_new_from_loaded ( imsg, msgid , status)
+    integer(kind=kindOfInt),intent(in)              :: imsg
+    integer(kind=kindOfInt),intent(out)             :: msgid
+    integer(kind=kindOfInt)                       :: iret
+    integer(kind=kindOfInt),optional,intent(out)    :: status
+
+    iret=any_f_new_from_loaded( imsg, msgid )
+    if (present(status)) then
+      status = iret
+    else
+      call grib_check(iret,'any_f_new_from_loaded','')
+    endif
+
+end subroutine codes_any_new_from_loaded 
+
   !> Load in memory a message from a file.
   !>
   !> The message can be accessed through its msgid and it will be available\n
@@ -963,7 +1051,7 @@ end subroutine codes_new_from_file
   !>
   !> @param ifile     id of the file opened with @ref codes_open_file
   !> @param msgid     id of the message loaded in memory
-  !> @param status    CODES_SUCCESS if OK, GRIB_END_OF_FILE at the end of file, or error code
+  !> @param status    CODES_SUCCESS if OK, CODES_END_OF_FILE at the end of file, or error code
 subroutine codes_any_new_from_file ( ifile, msgid , status)
     integer(kind=kindOfInt),intent(in)              :: ifile
     integer(kind=kindOfInt),intent(out)             :: msgid
@@ -981,7 +1069,7 @@ end subroutine codes_any_new_from_file
   !>
   !> @param ifile     id of the file opened with @ref codes_open_file
   !> @param gribid    id of the GRIB loaded in memory
-  !> @param status    CODES_SUCCESS if OK, GRIB_END_OF_FILE at the end of file, or error code
+  !> @param status    CODES_SUCCESS if OK, CODES_END_OF_FILE at the end of file, or error code
 subroutine codes_grib_new_from_file ( ifile, gribid , status)
     integer(kind=kindOfInt),intent(in)              :: ifile
     integer(kind=kindOfInt),intent(out)             :: gribid
@@ -999,7 +1087,7 @@ end subroutine codes_grib_new_from_file
   !>
   !> @param ifile     id of the file opened with @ref codes_open_file
   !> @param bufrid    id of the BUFR loaded in memory
-  !> @param status    CODES_SUCCESS if OK, GRIB_END_OF_FILE at the end of file, or error code
+  !> @param status    CODES_SUCCESS if OK, CODES_END_OF_FILE at the end of file, or error code
 subroutine codes_bufr_new_from_file ( ifile, bufrid , status)
     integer(kind=kindOfInt),intent(in)              :: ifile
     integer(kind=kindOfInt),intent(out)             :: bufrid
@@ -1275,8 +1363,8 @@ end subroutine codes_keys_iterator_new
   !> @param iterid   keys iterator id created with @ref codes_keys_iterator_new
   !> @param status   CODES_SUCCESS if next iterator exists, integer value if no more elements to iterate on
 subroutine codes_keys_iterator_next ( iterid , status)
-    integer(kind=kindOfInt),          intent(in)  :: iterid
-    integer(kind=kindOfInt),optional, intent(out) :: status
+    integer(kind=kindOfInt),   intent(in)  :: iterid
+    integer(kind=kindOfInt),   intent(out) :: status
 
     call grib_keys_iterator_next ( iterid , status)
 end subroutine codes_keys_iterator_next
@@ -1326,6 +1414,121 @@ subroutine codes_keys_iterator_rewind ( iterid, status )
 
     call grib_keys_iterator_rewind ( iterid, status )
 end subroutine codes_keys_iterator_rewind
+
+
+! BUFR keys iterator
+! -----------------------
+  !> Create a new iterator on the keys of a BUFR message.
+  !>
+  !> The keys iterator can be navigated to give all the key names which
+  !> can then be used to get or set the key values with \ref codes_get or
+  !> \ref codes_set.
+  !>
+  !> In case of error, if the status parameter (optional) is not given, the program will
+  !> exit with an error message.\n Otherwise the error message can be
+  !> gathered with @ref codes_get_error_string.
+  !>
+  !> @param msgid       id of the BUFR message loaded in memory
+  !> @param iterid      keys iterator id to be used in the keys iterator functions
+  !> @param status      CODES_SUCCESS if OK, integer value on error
+subroutine codes_bufr_keys_iterator_new ( msgid, iterid, status )
+    integer(kind=kindOfInt),          intent(in)     :: msgid
+    integer(kind=kindOfInt),          intent(inout)  :: iterid
+    integer(kind=kindOfInt),optional, intent(out)    :: status
+    integer(kind=kindOfInt)                          :: iret
+
+    iret = codes_f_bufr_keys_iterator_new(msgid, iterid)
+    if (present(status)) then
+        status = iret
+    else
+        call grib_check(iret,'bufr_keys_iterator_new','')
+    endif
+end subroutine codes_bufr_keys_iterator_new
+
+
+  !> Advance to the next BUFR keys iterator value.
+  !>
+  !> @param iterid   keys iterator id created with @ref codes_bufr_keys_iterator_new
+  !> @param status   CODES_SUCCESS if next iterator exists, integer value if no more elements to iterate on
+subroutine codes_bufr_keys_iterator_next (iterid , status)
+    integer(kind=kindOfInt), intent(in)  :: iterid
+    integer(kind=kindOfInt), intent(out) :: status
+    integer(kind=kindOfInt)              :: iret
+
+    status = GRIB_SUCCESS
+    iret = codes_f_bufr_keys_iterator_next( iterid )
+    if (iret == 0) then
+        ! no more elements
+        status = GRIB_END
+    endif
+end subroutine codes_bufr_keys_iterator_next
+
+
+  !> Get the name of a key from a BUFR keys iterator.
+  !>
+  !> If the status parameter (optional) is not given the program will exit with an error message\n
+  !> otherwise the error message can be gathered with @ref codes_get_error_string.\n
+  !>
+  !> @param iterid      keys iterator id created with @ref codes_bufr_keys_iterator_new
+  !> @param name        key name to be retrieved
+  !> @param status      CODES_SUCCESS if OK, integer value on error
+subroutine codes_bufr_keys_iterator_get_name( iterid, name, status )
+    integer(kind=kindOfInt),          intent(in)    :: iterid
+    character(LEN=*), intent(out)                   :: name
+    integer(kind=kindOfInt),optional, intent(out)   :: status
+    integer(kind=kindOfInt)                         :: iret
+
+    iret = codes_f_bufr_keys_iterator_get_name( iterid, name )
+    if (present(status)) then
+        status = iret
+    else
+        call grib_check(iret,'bufr_keys_iterator_get_name',name)
+    endif
+end subroutine codes_bufr_keys_iterator_get_name
+
+  !> Rewind a BUFR keys iterator.
+  !>
+  !> In case of error, if the status parameter (optional) is not given, the program will
+  !> exit with an error message.\n Otherwise the error message can be
+  !> gathered with @ref grib_get_error_string.
+  !>
+  !> @param iterid      keys iterator id created with @ref codes_bufr_keys_iterator_new
+  !> @param status      CODES_SUCCESS if OK, integer value on error
+  subroutine codes_bufr_keys_iterator_rewind( iterid, status )
+      integer(kind=kindOfInt),          intent(in)    :: iterid
+      integer(kind=kindOfInt),optional, intent(out)   :: status
+      integer(kind=kindOfInt)                         :: iret
+
+      iret = codes_f_bufr_keys_iterator_rewind( iterid )
+      if (present(status)) then
+         status = iret
+      else
+         call grib_check(iret,'bufr_keys_iterator_rewind','')
+      endif
+  end subroutine codes_bufr_keys_iterator_rewind
+
+  !> Delete a BUFR keys iterator and free memory.
+  !>
+  !> In case of error, if the status parameter (optional) is not given, the program will
+  !> exit with an error message.\n Otherwise the error message can be
+  !> gathered with @ref grib_get_error_string.
+  !>
+  !> @param iterid      keys iterator id created with @ref codes_bufr_keys_iterator_new
+  !> @param status      GRIB_SUCCESS if OK, integer value on error
+  subroutine codes_bufr_keys_iterator_delete (iterid , status)
+      integer(kind=kindOfInt),          intent(in)  :: iterid
+      integer(kind=kindOfInt),optional, intent(out) :: status
+      integer(kind=kindOfInt)                       :: iret
+
+      iret = codes_f_bufr_keys_iterator_delete(iterid)
+      if (present(status)) then
+         status = iret
+      else
+         call grib_check(iret,'bufr_keys_iterator_delete','')
+      endif
+  end subroutine codes_bufr_keys_iterator_delete
+
+
 
   !> Dump the content of a message.
   !>
@@ -1519,7 +1722,7 @@ end subroutine codes_get_real8
   !>
   !> @param msgid       id of the message loaded in memory
   !> @param key         key name
-  !> @param value       the real(8) value
+  !> @param value       the character value
   !> @param status      CODES_SUCCESS if OK, integer value on error
 subroutine codes_get_string ( msgid, key, value, status )
     integer(kind=kindOfInt),          intent(in)  :: msgid
@@ -1577,11 +1780,37 @@ subroutine codes_get_string_array ( msgid, key, value, status )
 
 end subroutine codes_get_string_array 
 
+  !> Copy data values from a BUFR message msgid1 to another message msgid2
+  !>
+  !> In case of error, if the status parameter (optional) is not given, the program will
+  !> exit with an error message.\n Otherwise the error message can be
+  !> gathered with @ref codes_get_error_string.\n
+  !>
+  !> @param msgid1      id of the message from which the data are copied
+  !> @param msgid2      id of the message to which the data are copied
+  !> @param status      CODES_SUCCESS if OK, integer value on error
+subroutine codes_bufr_copy_data ( msgid1, msgid2, status )
+    integer(kind=kindOfInt),               intent(in)  :: msgid1
+    integer(kind=kindOfInt),               intent(in)  :: msgid2
+    integer(kind=kindOfInt),optional, intent(out)      :: status
+    integer(kind=kindOfInt)                            :: iret
+
+    iret=codes_f_bufr_copy_data ( msgid1,msgid2 )
+
+    if (present(status)) then
+      status = iret
+    else
+      call grib_check(iret,'bufr_copy_data','error while copying')
+    endif
+
+end subroutine codes_bufr_copy_data 
+
   !> Set the string values for an array key in a message.
   !>
   !> In case of error, if the status parameter (optional) is not given, the program will
   !> exit with an error message.\n Otherwise the error message can be
   !> gathered with @ref codes_get_error_string.
+  !> Note: This function supports the \b allocatable array attribute
   !>
   !> @param msgid      id of the message loaded in memory
   !> @param key        key name
@@ -1863,17 +2092,17 @@ end subroutine codes_get_real8_array
   !>
   !> @param msgid   id of the grib loaded in memory
   !> @param key     key name
-  !> @param index   integer(4) index
+  !> @param kindex  integer(4) index
   !> @param value   real(4) value
   !> @param status  CODES_SUCCESS if OK, integer value on error
-subroutine codes_get_real4_element ( msgid, key, index,value, status )
+subroutine codes_get_real4_element ( msgid, key, kindex,value, status )
     integer(kind=kindOfInt),                     intent(in)  :: msgid
     character(len=*),                            intent(in)  :: key
-    integer(kind=kindOfInt),                     intent(in)  :: index
+    integer(kind=kindOfInt),                     intent(in)  :: kindex
     real(kind = kindOfFloat),                    intent(out) :: value
     integer(kind=kindOfInt),optional,            intent(out) :: status
 
-    call grib_get_real4_element ( msgid, key, index,value, status )
+    call grib_get_real4_element ( msgid, key, kindex,value, status )
 end subroutine codes_get_real4_element 
 
 
@@ -1885,17 +2114,17 @@ end subroutine codes_get_real4_element
   !>
   !> @param msgid      id of the grib loaded in memory
   !> @param key        key name
-  !> @param index      integer(4) index
+  !> @param kindex     integer(4) index
   !> @param value      real(8) value
   !> @param status     CODES_SUCCESS if OK, integer value on error
-subroutine codes_get_real8_element ( msgid, key, index,value, status )
+subroutine codes_get_real8_element ( msgid, key, kindex,value, status )
     integer(kind=kindOfInt),                     intent(in)  :: msgid
     character(len=*),                            intent(in)  :: key
-    integer(kind=kindOfInt),                     intent(in)  :: index
+    integer(kind=kindOfInt),                     intent(in)  :: kindex
     real(kind = kindOfDouble),                   intent(out) :: value
     integer(kind=kindOfInt),optional,            intent(out) :: status
 
-    call grib_get_real8_element ( msgid, key, index,value, status )
+    call grib_get_real8_element ( msgid, key, kindex,value, status )
 end subroutine codes_get_real8_element
 
 
@@ -1907,17 +2136,17 @@ end subroutine codes_get_real8_element
   !>
   !> @param msgid      id of the grib loaded in memory
   !> @param key        key name
-  !> @param index      integer(4) array indexes
+  !> @param kindex     integer(4) array indexes
   !> @param value      real(4) array value
   !> @param status     CODES_SUCCESS if OK, integer value on error
-subroutine codes_get_real4_elements ( msgid, key, index,value, status )
+subroutine codes_get_real4_elements ( msgid, key, kindex,value, status )
     integer(kind=kindOfInt),                  intent(in)  :: msgid
     character(len=*),                         intent(in)  :: key
-    integer(kind=kindOfInt),dimension(:),  intent(in)     :: index
+    integer(kind=kindOfInt),dimension(:),  intent(in)     :: kindex
     real(kind = kindOfFloat), dimension(:),   intent(out) :: value
     integer(kind=kindOfInt),optional,         intent(out) :: status
 
-    call grib_get_real4_elements ( msgid, key, index,value, status )
+    call grib_get_real4_elements ( msgid, key, kindex,value, status )
 end subroutine codes_get_real4_elements 
 
   !> Get the real(8) values whose indexes are stored in the array "index" from an array key.
@@ -1928,17 +2157,17 @@ end subroutine codes_get_real4_elements
   !>
   !> @param msgid      id of the grib loaded in memory
   !> @param key        key name
-  !> @param index      integer(4) array index
+  !> @param kindex     integer(4) array index
   !> @param value      real(8) array value
   !> @param status     CODES_SUCCESS if OK, integer value on error
-subroutine codes_get_real8_elements ( msgid, key, index,value, status )
+subroutine codes_get_real8_elements ( msgid, key, kindex,value, status )
     integer(kind=kindOfInt),                   intent(in)  :: msgid
     character(len=*),                          intent(in)  :: key
-    integer(kind=kindOfInt),dimension(:),   intent(in)     :: index
+    integer(kind=kindOfInt),dimension(:),   intent(in)     :: kindex
     real(kind = kindOfDouble), dimension(:),   intent(out) :: value
     integer(kind=kindOfInt),optional,          intent(out) :: status
 
-    call grib_get_real8_elements ( msgid, key, index,value, status )
+    call grib_get_real8_elements ( msgid, key, kindex,value, status )
 end subroutine codes_get_real8_elements 
 
   !> Set the integer value for a key in a message.
@@ -2274,7 +2503,7 @@ end subroutine codes_grib_multi_write
   !>
   !> @param ingribid      id of the input single grib 
   !> @param startsection  starting from startsection (included) all the sections are copied from the input single grib to the output multi grib
-  !> @param multigribid    id of the output multi filed grib
+  !> @param multigribid    id of the output multi field grib
   !> @param status      CODES_SUCCESS if OK, integer value on error
 subroutine codes_grib_multi_append ( ingribid, startsection, multigribid  , status)
     integer(kind=kindOfInt),          intent(in)  :: ingribid
@@ -2334,12 +2563,12 @@ end subroutine codes_grib_find_nearest_multiple
   !> @param outlat     latitude of the nearest point
   !> @param outlon     longitude of the nearest point
   !> @param distance   distance between the given point and its nearest
-  !> @param index      zero based index
+  !> @param kindex     zero based index
   !> @param value      value of the field in the nearest point
   !> @param status     CODES_SUCCESS if OK, integer value on error
 subroutine codes_grib_find_nearest_single(gribid,is_lsm,  &
                  inlat,inlon,outlat,outlon,          &
-                 value,distance, index,status)
+                 value,distance, kindex,status)
     integer(kind=kindOfInt),   intent(in)   :: gribid
     logical,                   intent(in)   :: is_lsm
     real(kind = kindOfDouble), intent(in)   :: inlat
@@ -2348,12 +2577,12 @@ subroutine codes_grib_find_nearest_single(gribid,is_lsm,  &
     real(kind = kindOfDouble), intent(out)  :: outlon
     real(kind = kindOfDouble), intent(out)  :: distance
     real(kind = kindOfDouble), intent(out)  :: value
-    integer(kind = kindOfInt), intent(out)  :: index
+    integer(kind = kindOfInt), intent(out)  :: kindex
     integer(kind=kindOfInt),optional, intent(out)  :: status
 
     call grib_find_nearest_single(gribid,is_lsm,  &
                  inlat,inlon,outlat,outlon,       &
-                 value,distance, index,status)
+                 value,distance, kindex,status)
 end subroutine codes_grib_find_nearest_single
 
 
@@ -2370,12 +2599,12 @@ end subroutine codes_grib_find_nearest_single
   !> @param outlat     latitude of the nearest point
   !> @param outlon     longitude of the nearest point
   !> @param distance   distance between the given point and its nearest
-  !> @param index      zero based index
+  !> @param kindex     zero based index
   !> @param value      value of the field in the nearest point
   !> @param status     CODES_SUCCESS if OK, integer value on error
 subroutine codes_grib_find_nearest_four_single(gribid,is_lsm, &
                  inlat,inlon,outlat,outlon,              &
-                 value,distance, index,status)
+                 value,distance, kindex,status)
     integer(kind=kindOfInt),                  intent(in)    :: gribid
     logical,                                  intent(in)    :: is_lsm
     real(kind = kindOfDouble), intent(in)                   :: inlat
@@ -2384,12 +2613,12 @@ subroutine codes_grib_find_nearest_four_single(gribid,is_lsm, &
     real(kind = kindOfDouble), dimension(4), intent(out)    :: outlon
     real(kind = kindOfDouble), dimension(4), intent(out)    :: distance
     real(kind = kindOfDouble), dimension(4), intent(out)    :: value
-    integer(kind = kindOfInt), dimension(4), intent(out)    :: index
+    integer(kind = kindOfInt), dimension(4), intent(out)    :: kindex
     integer(kind=kindOfInt),optional, intent(out)           :: status
 
     call grib_find_nearest_four_single(gribid,is_lsm, &
                  inlat,inlon,outlat,outlon,           &
-                 value,distance, index,status)
+                 value,distance, kindex,status)
   end subroutine codes_grib_find_nearest_four_single
 
 
@@ -2548,6 +2777,63 @@ subroutine codes_set_samples_path ( path,  status )
 end subroutine codes_set_samples_path
 
 
+subroutine codes_julian_to_datetime ( jd,year,month,day,hour,minute,second,  status )
+    real(kind=kindOfDouble) , intent(in)          :: jd
+    integer(kind=kindOfLong) , intent(out)         :: year,month,day,hour,minute,second
+    integer(kind=kindOfInt),optional, intent(out)  :: status
+    integer(kind=kindOfInt)                        :: iret
+
+    iret=grib_f_julian_to_datetime(jd,year,month,day,hour,minute,second)
+    if (iret /= 0) then
+      if (present(status)) then
+         status = iret
+      else
+         call grib_check(iret,'codes_julian_to_datetime',' ')
+      endif
+      return
+    endif
+end subroutine codes_julian_to_datetime
+
+subroutine codes_datetime_to_julian ( year,month,day,hour,minute,second,jd, status )
+    integer(kind=kindOfLong) , intent(in) :: year,month,day,hour,minute,second
+    real (kind=kindOfDouble) , intent(out)  :: jd
+    integer(kind=kindOfInt),optional, intent(out)  :: status
+    integer(kind=kindOfInt)                        :: iret
+
+    iret=grib_f_datetime_to_julian(year,month,day,hour,minute,second,jd)
+    if (iret /= 0) then
+      if (present(status)) then
+         status = iret
+      else
+         call grib_check(iret,'codes_datetime_to_julian',' ')
+      endif
+      return
+    endif
+end subroutine codes_datetime_to_julian
+
+  !> Copy the value of a key from the source message to the destination message
+  !>
+  !> In case of error, if the status parameter (optional) is not given, the program will
+  !> exit with an error message.\n Otherwise the error message can be
+  !> gathered with @ref codes_get_error_string.
+  !>
+  !> @param msgid_src     source message
+  !> @param msgid_dest    destination message
+  !> @param key           key whose value is to be copied
+  !> @param status        GRIB_SUCCESS if OK, integer value on error
+subroutine codes_copy_key( msgid_src, key, msgid_dest, status )
+    integer(kind=kindOfInt),          intent(in)  :: msgid_src
+    integer(kind=kindOfInt),          intent(in)  :: msgid_dest
+    character(LEN=*),                 intent(in)  :: key
+    integer(kind=kindOfInt),optional, intent(out) :: status
+    integer(kind=kindOfInt)                       :: iret
+
+    iret=grib_f_copy_key(msgid_src, key, msgid_dest)
+    if (present(status)) then
+        status = iret
+    else
+        call grib_check(iret,'codes_copy_key','('//key//')')
+    endif
+end subroutine codes_copy_key 
 
 end module eccodes
-

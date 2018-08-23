@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -463,11 +463,6 @@ static void init_accessor(grib_accessor_class* c,grib_accessor* a, const long le
 {
     if(c) {
         grib_accessor_class *s = c->super ? *(c->super) : NULL;
-        if(!c->inited)
-        {
-            if(c->init_class) c->init_class(c);
-            c->inited = 1;
-        }
         init_accessor(s,a,len,args);
         if(c->init) c->init(a,len, args);
     }
@@ -503,6 +498,7 @@ void grib_accessor_delete(grib_context *ct, grib_accessor* a)
         }
         c = s;
     }
+    /*printf("Debug: grib_accessor_delete a=%p (%s)\n", (void*)a, a->name);*/
     grib_context_free(ct,a);
 }
 
@@ -643,14 +639,13 @@ const char* grib_get_type_name(int type)
 {
     switch(type)
     {
-    case GRIB_TYPE_LONG:    return "long"; break;
-    case GRIB_TYPE_STRING:  return "string"; break;
-    case GRIB_TYPE_BYTES:   return "bytes"; break;
-    case GRIB_TYPE_DOUBLE:  return "double"; break;
-    case GRIB_TYPE_LABEL:   return "label"; break;
-    case GRIB_TYPE_SECTION: return "section"; break;
+        case GRIB_TYPE_LONG:    return "long"; break;
+        case GRIB_TYPE_STRING:  return "string"; break;
+        case GRIB_TYPE_BYTES:   return "bytes"; break;
+        case GRIB_TYPE_DOUBLE:  return "double"; break;
+        case GRIB_TYPE_LABEL:   return "label"; break;
+        case GRIB_TYPE_SECTION: return "section"; break;
     }
-
     return "unknown";
 }
 
@@ -736,7 +731,7 @@ const char* grib_accessor_get_name(grib_accessor* a) {
 grib_accessor* _grib_accessor_get_attribute(grib_accessor* a,const char* name,int* index)
 {
     int i=0;
-    while (a->attributes[i] && i<MAX_ACCESSOR_ATTRIBUTES) {
+    while (i<MAX_ACCESSOR_ATTRIBUTES && a->attributes[i]) {
         if (!strcmp(a->attributes[i]->name,name)) {
             *index=i;
             return a->attributes[i];
@@ -779,7 +774,7 @@ grib_accessors_list* grib_accessors_list_create(grib_context* c)
     return (grib_accessors_list*)grib_context_malloc_clear(c,sizeof(grib_accessors_list));
 }
 
-void grib_accessors_list_push(grib_accessors_list* al,grib_accessor* a)
+void grib_accessors_list_push(grib_accessors_list* al,grib_accessor* a,int rank)
 {
     grib_accessors_list* last;
     grib_context* c=a->context;
@@ -789,9 +784,11 @@ void grib_accessors_list_push(grib_accessors_list* al,grib_accessor* a)
         last->next=(grib_accessors_list*)grib_context_malloc_clear(c,sizeof(grib_accessors_list));
         last->next->accessor=a;
         last->next->prev=last;
+        last->next->rank=rank;
         al->last=last->next;
     } else {
         al->accessor=a;
+        al->rank=rank;
         al->last=al;
     }
 }

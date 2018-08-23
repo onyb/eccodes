@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2016 ECMWF.
+ * Copyright 2005-2018 ECMWF.
  *
  * This software is licensed under the terms of the Apache Licence Version 2.0
  * which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
@@ -148,7 +148,6 @@ static void init(grib_accessor* a, const long len , grib_arguments* arg )
     a->length = len * count;
     self->nbytes = len;
     Assert(a->length>=0);
-
 }
 
 static void dump(grib_accessor* a, grib_dumper* dumper)
@@ -161,14 +160,13 @@ static void dump(grib_accessor* a, grib_dumper* dumper)
         grib_dump_values(dumper,a);
 }
 
-static long ones[] = {
+static const long ones[] = {
         0,
         -0x7f,
         -0x7fff,
         -0x7fffff,
         -0x7fffffff,
 };
-
 
 static int unpack_long(grib_accessor* a, long* val, size_t *len)
 {
