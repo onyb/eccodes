@@ -1,0 +1,34 @@
+set -ea
+# For CMake
+
+# If this environment variable is set, then become verbose
+# so one can see why and how a test failed
+if test "x$ECCODES_TEST_VERBOSE_OUTPUT" != "x"; then
+   set -x
+fi
+
+proj_dir=@PROJECT_SOURCE_DIR@
+data_dir=@PROJECT_BINARY_DIR@/data
+
+# use definitions from binary dir to test if installation will be correct
+# Note: 'definitions' is a symlink so must put final slash to interpret as directory
+def_dir="@CMAKE_BINARY_DIR@/share/@PROJECT_NAME@/definitions/"
+ECCODES_DEFINITION_PATH="${def_dir}"
+export ECCODES_DEFINITION_PATH
+
+# binaries are in the TOP CMAKE_BINARY_DIR
+tools_dir=@CMAKE_BINARY_DIR@/bin/
+tigge_dir=@CMAKE_BINARY_DIR@/bin/
+
+# ecCodes tests are in the PROJECT_BINARY_DIR
+test_dir=@PROJECT_BINARY_DIR@/tests/
+
+# use samples from binary dir to test if installation will be correct
+samp_dir="@CMAKE_BINARY_DIR@/share/@PROJECT_NAME@/samples"
+ECCODES_SAMPLES_PATH=${samp_dir}
+export ECCODES_SAMPLES_PATH
+
+# Options
+HAVE_JPG=@HAVE_JPG@
+HAVE_PNG=@HAVE_PNG@
+HAVE_AEC=@HAVE_AEC@
